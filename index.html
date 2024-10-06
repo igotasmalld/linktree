@@ -7,8 +7,8 @@
     <style>
       body {
         font-family: Arial, sans-serif;
-        background-color: #ffffff; /* White background for light mode */
-        color: #000000; /* Black text for light mode */
+        background-color: #f0f0f0; /* Light background */
+        color: #333333; /* Dark text color */
         margin: 0;
         padding: 0;
       }
@@ -17,28 +17,41 @@
         flex-direction: column;
         align-items: center;
         padding: 20px;
-        background-color: #ffffff; /* Keep header white */
-        color: #000000;
+        background-color: #ffffff; /* White background for header */
+        color: #333333; /* Dark text */
         font-size: 24px;
         font-weight: bold;
+        border-bottom: 1px solid #cccccc; /* Subtle border for header */
+      }
+      .header .logo {
+        display: flex;
+        align-items: center;
+        margin-bottom: 20px;
+      }
+      .header .orange-box {
+        background-color: #ff9900; /* Bright orange for the 'Hub' */
+        color: white;
+        padding: 5px 10px;
+        margin-left: 5px;
+        border-radius: 3px;
       }
       .search-container {
         width: 100%;
         text-align: center;
-        margin-bottom: 20px;
       }
       #searchBar {
         padding: 15px;
         width: 100%;
         max-width: 600px;
         font-size: 18px;
-        background-color: #f0f0f0; /* Light grey input field */
-        color: #000000; /* Black text in input */
-        border: 1px solid #ccc; /* Light grey border */
+        background-color: #ffffff; /* Light input field */
+        color: #333333; /* Dark text in input */
+        border: 1px solid #cccccc; /* Light grey border */
         border-radius: 40px; /* Rounded corners */
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
       }
       #searchBar::placeholder {
-        color: #666; /* Placeholder color */
+        color: #888888; /* Grey placeholder text */
       }
       .button-container {
         display: flex;
@@ -53,30 +66,35 @@
         display: flex;
         justify-content: center;
         align-items: center;
-        background-color: #f0f0f0; /* Light grey background for buttons */
-        color: #000000; /* Black text */
+        background-color: #ffffff; /* Light background for buttons */
+        color: #333333; /* Dark text */
         text-decoration: none;
         text-align: center;
         font-size: 16px;
         font-weight: bold;
         border-radius: 4px;
-        border: 1px solid #ccc; /* Light border for buttons */
-        transition: background-color 0.3s ease, border 0.3s ease;
+        border: 1px solid #cccccc; /* Light border for buttons */
+        transition: background-color 0.3s ease, box-shadow 0.3s ease;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Subtle shadow */
       }
       .button-container a:hover {
-        background-color: #e0e0e0; /* Slightly darker grey on hover */
-        border: 1px solid #aaa; /* Darker border on hover */
+        background-color: #ff9900; /* Bright orange on hover */
+        color: #ffffff; /* White text on hover */
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.15); /* Deeper shadow on hover */
       }
     </style>
   </head>
   <body>
-    <div class="search-container">
-      <input
-        type="text"
-        id="searchBar"
-        onkeyup="searchButtons()"
-        placeholder="Search for websites..."
-      />
+    <div class="header">
+      <div class="logo">Link<span class="orange-box">Hub</span></div>
+      <div class="search-container">
+        <input
+          type="text"
+          id="searchBar"
+          onkeyup="searchButtons()"
+          placeholder="Search for websites..."
+        />
+      </div>
     </div>
 
     <div class="button-container" id="buttonContainer">
@@ -92,6 +110,7 @@
         target="_blank"
         >QR Code Generator</a
       >
+      <!-- Repeat for up to 50 buttons -->
       <a href="https://example50.com" class="website-button" target="_blank"
         >FMC</a
       >
