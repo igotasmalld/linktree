@@ -15,11 +15,16 @@
       .header {
         display: flex;
         align-items: center;
+        justify-content: space-between;
         padding: 20px;
         background-color: #000000; /* Keep header black */
         color: #ffffff;
         font-size: 24px;
         font-weight: bold;
+      }
+      .header .logo {
+        display: flex;
+        align-items: center;
       }
       .header .orange-box {
         background-color: #ff9900; /* Pornhub-like orange */
@@ -29,10 +34,8 @@
         border-radius: 3px;
       }
       .search-container {
-        margin: 20px auto;
-        display: flex;
-        justify-content: center;
-        max-width: 1000px;
+        flex-grow: 1;
+        margin-left: 20px;
       }
       #searchBar {
         padding: 12px;
@@ -76,16 +79,17 @@
   </head>
   <body>
     <div class="header">
-      Link<span class="orange-box">Hub</span>
-    </div>
-
-    <div class="search-container">
-      <input
-        type="text"
-        id="searchBar"
-        onkeyup="searchButtons()"
-        placeholder="Search for websites..."
-      />
+      <div class="logo">
+        Link<span class="orange-box">Hub</span>
+      </div>
+      <div class="search-container">
+        <input
+          type="text"
+          id="searchBar"
+          onkeyup="searchButtons()"
+          placeholder="Search for websites..."
+        />
+      </div>
     </div>
 
     <div class="button-container" id="buttonContainer">
