@@ -7,17 +7,38 @@
     <style>
       body {
         font-family: Arial, sans-serif;
-        background-color: #121212; /* Dark background */
-        color: #ffffff; /* Light text */
+        background-color: #000000; /* Black background */
+        color: #ffffff; /* White text */
+        margin: 0;
+        padding: 0;
+      }
+      .header {
+        display: flex;
+        align-items: center;
+        padding: 20px;
+        background-color: #000000; /* Keep header black */
+        color: #ffffff;
+        font-size: 24px;
+        font-weight: bold;
+      }
+      .header .orange-box {
+        background-color: #ff9900; /* Pornhub-like orange */
+        color: black;
+        padding: 5px 10px;
+        margin-left: 5px;
+        border-radius: 3px;
       }
       .search-container {
-        margin-bottom: 20px;
+        margin: 20px auto;
+        display: flex;
+        justify-content: center;
+        max-width: 1000px;
       }
       #searchBar {
-        padding: 10px;
+        padding: 12px;
         width: 100%;
-        max-width: 400px; /* Adjusted max-width for a smaller search bar */
-        font-size: 16px;
+        max-width: 600px;
+        font-size: 18px;
         background-color: #1e1e1e; /* Darker input field */
         color: #ffffff; /* Light text in input */
         border: 1px solid #333; /* Border color */
@@ -30,27 +51,34 @@
         display: flex;
         flex-wrap: wrap;
         gap: 10px;
+        justify-content: center;
+        margin-top: 20px;
       }
       .button-container a {
-        width: 100px;
-        height: 100px;
+        width: 150px;
+        height: 80px;
         display: flex;
         justify-content: center;
         align-items: center;
-        background-color: #ff9800; /* Orange background */
-        color: white;
+        background-color: #333333; /* Dark grey background for buttons */
+        color: #ffffff;
         text-decoration: none;
         text-align: center;
-        font-size: 14px;
-        border-radius: 8px;
+        font-size: 16px;
+        font-weight: bold;
+        border-radius: 4px;
         transition: background-color 0.3s ease;
       }
       .button-container a:hover {
-        background-color: #fb8c00; /* Darker orange on hover */
+        background-color: #ff9900; /* Pornhub-like orange on hover */
       }
     </style>
   </head>
   <body>
+    <div class="header">
+      Link<span class="orange-box">Hub</span>
+    </div>
+
     <div class="search-container">
       <input
         type="text"
@@ -61,26 +89,26 @@
     </div>
 
     <div class="button-container" id="buttonContainer">
-      <a href="https://example1.com" class="website-button" target="_blank">Station Command Center (SSC)</a>
-      <a href="https://example2.com" class="website-button" target="_blank">Yard Management</a>
-      <a href="https://www.the-qrcode-generator.com/" class="website-button" target="_blank">QR Code Generator</a>
+      <a href="https://example1.com" class="website-button" target="_blank"
+        >Station Command Center (SSC)</a
+      >
+      <a href="https://example2.com" class="website-button" target="_blank"
+        >Yard Management</a
+      >
+      <a
+        href="https://www.the-qrcode-generator.com/"
+        class="website-button"
+        target="_blank"
+        >QR Code Generator</a
+      >
       <!-- Repeat for up to 50 buttons -->
-      <a href="https://example50.com" class="website-button" target="_blank">FMC</a>
-      <a href="https://example50.com" class="website-button" target="_blank">Phonetool</a>
-      <a href="https://example50.com" class="website-button" target="_blank">Website 50</a>
-      <a href="https://example50.com" class="website-button" target="_blank">Website 50</a>
-      <a href="https://example50.com" class="website-button" target="_blank">Website 50</a>
-      <a href="https://example50.com" class="website-button" target="_blank">Website 50</a>
-      <a href="https://example50.com" class="website-button" target="_blank">Website 50</a>
-      <a href="https://example50.com" class="website-button" target="_blank">Website 50</a>
-      <a href="https://example50.com" class="website-button" target="_blank">Website 50</a>
-      <a href="https://example50.com" class="website-button" target="_blank">Website 50</a>
-      <a href="https://example50.com" class="website-button" target="_blank">Website 50</a>
-      <a href="https://example50.com" class="website-button" target="_blank">Website 50</a>
-      <a href="https://example50.com" class="website-button" target="_blank">Website 50</a>
-
-      <a href="https://example50.com" class="website-button" target="_blank">Website 50</a>
-      <a href="https://example50.com" class="website-button" target="_blank">Website 50</a>
+      <a href="https://example50.com" class="website-button" target="_blank"
+        >FMC</a
+      >
+      <a href="https://example50.com" class="website-button" target="_blank"
+        >Phonetool</a
+      >
+      <!-- Additional buttons go here -->
     </div>
 
     <script>
