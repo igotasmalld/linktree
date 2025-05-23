@@ -1,45 +1,26 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Nice Font Example</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+  <meta charset="UTF-8">
+  <title>Image Display</title>
   <style>
     body {
-      font-family: 'Inter', sans-serif;
-      background-color: #f4f4f8;
-      color: #333;
-      padding: 40px;
-      max-width: 700px;
-      margin: auto;
-      line-height: 1.6;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+      background-color: #f0f0f0;
     }
-
-    h1 {
-      font-size: 2.5rem;
-      font-weight: 600;
-      color: #222;
-      margin-bottom: 20px;
-    }
-
-    p {
-      font-size: 1.125rem;
-      margin-bottom: 20px;
-    }
-
-    a {
-      color: #4a90e2;
-      text-decoration: none;
-    }
-
-    a:hover {
-      text-decoration: underline;
+    img {
+      max-width: 90%;
+      max-height: 90%;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
     }
   </style>
 </head>
 <body>
-  <h1>Benvenuto su DLO1.com</h1>
-  <p>Questo sito era stato creato con le migliori intenzioni.</p>
+  <img src="https://media.newyorker.com/photos/5a666a6a6731fd1ea7517e21/1:1/w_2591,h_2591,c_limit/Angler-Im-Jeff-Bezos-Im-Your-Dad-Now.jpg" alt="Jeff Bezos Meme">
 </body>
 </html>
