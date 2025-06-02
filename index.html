@@ -2,136 +2,163 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Bezos Blaster: Tax Evasion Edition</title>
+  <title>Amazon Box Clicker</title>
   <style>
-    body {
+    html, body {
       margin: 0;
+      padding: 0;
       overflow: hidden;
-      background: #000;
+      font-family: Arial, sans-serif;
+      background: linear-gradient(to top, #111, #333);
       color: white;
-      font-family: 'Arial', sans-serif;
     }
-    canvas {
-      display: block;
-      background: linear-gradient(#000011, #000033);
-    }
+
     #score {
       position: absolute;
       top: 10px;
-      left: 10px;
+      left: 20px;
       font-size: 24px;
       font-weight: bold;
     }
-    #quote {
+
+    #gameCanvas {
+      display: block;
+      background: #1a1a1a;
+    }
+
+    #gameOver {
       position: absolute;
-      top: 10px;
-      right: 10px;
-      font-size: 16px;
-      max-width: 250px;
-      text-align: right;
-      font-style: italic;
+      top: 40%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 32px;
+      background: rgba(0, 0, 0, 0.8);
+      padding: 30px;
+      border: 2px solid #f90;
+      border-radius: 10px;
+      display: none;
+      text-align: center;
+    }
+
+    button {
+      margin-top: 15px;
+      padding: 10px 20px;
+      font-size: 18px;
+      background: #f90;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
     }
   </style>
 </head>
 <body>
-  <div id="score">📦 Revenue: $0</div>
-  <div id="quote"></div>
+  <div id="score">📦 Score: 0</div>
   <canvas id="gameCanvas" width="800" height="600"></canvas>
+  <div id="gameOver">
+    <p>💀 Too many boxes missed!</p>
+    <p id="finalScore"></p>
+    <button onclick="restartGame()">Play Again</button>
+  </div>
 
   <script>
-    const canvas = document.getElementById('gameCanvas');
-    const ctx = canvas.getContext('2d');
+    const canvas = document.getElementById("gameCanvas");
+    const ctx = canvas.getContext("2d");
+    const scoreEl = document.getElementById("score");
+    const gameOverEl = document.getElementById("gameOver");
+    const finalScoreEl = document.getElementById("finalScore");
 
-    let player = { x: 400, y: 500, size: 40 };
-    let keys = {};
+    const boxImg = new Image();
+    boxImg.src = "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a9/Amazon_box.svg/320px-Amazon_box.svg.png";
+
+    let boxes = [];
     let score = 0;
-    let amazonBoxes = [];
-    let taxAgents = [];
-
-    const bezosQuotes = [
-      "Work hard, have fun, make history.",
-      "Your margin is my opportunity.",
-      "If you do build a great experience, customers will tell each other.",
-      "We are stubborn on vision. We are flexible on details.",
-      "It’s always Day One."
-    ];
-
-    function randomQuote() {
-      const quote = bezosQuotes[Math.floor(Math.random() * bezosQuotes.length)];
-      document.getElementById('quote').textContent = `"${quote}" — Jeff Bezos`;
-    }
-
-    setInterval(randomQuote, 5000);
-    randomQuote();
-
-    function drawBezos(x, y) {
-      ctx.fillStyle = '#f5deb3';
-      ctx.beginPath();
-      ctx.arc(x, y, 20, 0, Math.PI * 2);
-      ctx.fill(); // Bezos head
-      ctx.fillStyle = '#000';
-      ctx.font = '16px Arial';
-      ctx.fillText("🧔", x - 10, y + 5); // Bezos emoji face
-    }
+    let missed = 0;
+    let gameRunning = true;
+    let spawnRate = 1000;
+    let speedMultiplier = 1;
 
     function spawnBox() {
-      amazonBoxes.push({ x: Math.random() * 760, y: -20 });
-    }
-
-    function spawnTaxMan() {
-      taxAgents.push({ x: Math.random() * 760, y: -20 });
+      if (!gameRunning) return;
+      boxes.push({
+        x: Math.random() * (canvas.width - 60),
+        y: -60,
+        size: 60,
+        speed: 2 + Math.random() * 2 * speedMultiplier
+      });
     }
 
     function update() {
+      if (!gameRunning) return;
+
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-      // Move player
-      if (keys['ArrowLeft'] && player.x > 0) player.x -= 5;
-      if (keys['ArrowRight'] && player.x < canvas.width) player.x += 5;
-      if (keys['ArrowUp'] && player.y > 0) player.y -= 5;
-      if (keys['ArrowDown'] && player.y < canvas.height) player.y += 5;
+      // Draw and update boxes
+      for (let i = boxes.length - 1; i >= 0; i--) {
+        const box = boxes[i];
+        box.y += box.speed;
 
-      drawBezos(player.x, player.y);
+        ctx.drawImage(boxImg, box.x, box.y, box.size, box.size);
 
-      // Boxes
-      for (let i = amazonBoxes.length - 1; i >= 0; i--) {
-        amazonBoxes[i].y += 3;
-        ctx.font = '22px Arial';
-        ctx.fillStyle = 'orange';
-        ctx.fillText("📦", amazonBoxes[i].x, amazonBoxes[i].y);
-        if (Math.abs(player.x - amazonBoxes[i].x) < 25 && Math.abs(player.y - amazonBoxes[i].y) < 25) {
-          score += 100;
-          amazonBoxes.splice(i, 1);
-        } else if (amazonBoxes[i].y > canvas.height) {
-          amazonBoxes.splice(i, 1);
+        // Missed box
+        if (box.y > canvas.height) {
+          boxes.splice(i, 1);
+          missed++;
+          if (missed >= 5) {
+            endGame();
+          }
         }
       }
 
-      // Taxes
-      for (let i = taxAgents.length - 1; i >= 0; i--) {
-        taxAgents[i].y += 4;
-        ctx.font = '22px Arial';
-        ctx.fillStyle = 'red';
-        ctx.fillText("🕵️", taxAgents[i].x, taxAgents[i].y);
-        if (Math.abs(player.x - taxAgents[i].x) < 25 && Math.abs(player.y - taxAgents[i].y) < 25) {
-          alert("💀 Caught by the IRS! Final Revenue: $" + score);
-          location.reload();
-        } else if (taxAgents[i].y > canvas.height) {
-          taxAgents.splice(i, 1);
-        }
-      }
+      scoreEl.textContent = `📦 Score: ${score}`;
 
-      document.getElementById('score').textContent = `📦 Revenue: $${score}`;
       requestAnimationFrame(update);
     }
 
-    setInterval(spawnBox, 800);
-    setInterval(spawnTaxMan, 1500);
+    canvas.addEventListener("click", function (e) {
+      const rect = canvas.getBoundingClientRect();
+      const mouseX = e.clientX - rect.left;
+      const mouseY = e.clientY - rect.top;
 
-    document.addEventListener('keydown', e => keys[e.key] = true);
-    document.addEventListener('keyup', e => keys[e.key] = false);
+      for (let i = boxes.length - 1; i >= 0; i--) {
+        const box = boxes[i];
+        if (
+          mouseX >= box.x &&
+          mouseX <= box.x + box.size &&
+          mouseY >= box.y &&
+          mouseY <= box.y + box.size
+        ) {
+          boxes.splice(i, 1);
+          score++;
+          speedMultiplier += 0.02;
+          return;
+        }
+      }
+    });
 
-    update();
+    function endGame() {
+      gameRunning = false;
+      gameOverEl.style.display = "block";
+      finalScoreEl.textContent = `Final Score: ${score}`;
+    }
+
+    function restartGame() {
+      score = 0;
+      missed = 0;
+      boxes = [];
+      speedMultiplier = 1;
+      gameRunning = true;
+      gameOverEl.style.display = "none";
+      update();
+    }
+
+    // Game loop
+    setInterval(() => {
+      if (gameRunning) spawnBox();
+    }, spawnRate);
+
+    boxImg.onload = () => {
+      update();
+    };
   </script>
 </body>
 </html>
