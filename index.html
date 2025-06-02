@@ -1,31 +1,72 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Jeff Bezos Net Worth</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            text-align: center;
-            margin-top: 50px;
-        }
-        #net-worth {
-            font-size: 2em;
-            color: #333;
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Bezos Net Worth Calculator</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f4f4;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      padding: 20px;
+    }
+    .container {
+      background: white;
+      padding: 2rem;
+      border-radius: 10px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+      max-width: 400px;
+      width: 100%;
+      text-align: center;
+    }
+    input {
+      padding: 10px;
+      width: 100%;
+      font-size: 1rem;
+      margin-bottom: 1rem;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+    .result {
+      font-size: 1.25rem;
+      font-weight: bold;
+      margin-top: 1rem;
+    }
+    .note {
+      font-size: 0.9rem;
+      color: #666;
+      margin-top: 0.5rem;
+    }
+  </style>
 </head>
 <body>
-    <h1>Jeff Bezos's Real-Time Net Worth</h1>
-    <div id="net-worth">Loading...</div>
-    <script>
-        async function fetchNetWorth() {
-            const response = await fetch('https://api.example.com/networth/jeff-bezos');
-            const data = await response.json();
-            document.getElementById('net-worth').textContent = `$${data.netWorth}`;
-        }
-        fetchNetWorth();
-    </script>
+  <div class="container">
+    <h1>Bezos Net Worth Calculator</h1>
+    <p>Enter your annual income:</p>
+    <input type="number" id="income" placeholder="e.g., 50000" />
+    <div class="result" id="result">Years needed: –</div>
+    <div class="note">Assumes Jeff Bezos's net worth is $203 billion.</div>
+  </div>
+
+  <script>
+    const bezosNetWorth = 203_000_000_000;
+    const input = document.getElementById("income");
+    const resultDiv = document.getElementById("result");
+
+    input.addEventListener("input", () => {
+      const income = parseFloat(input.value);
+      if (isNaN(income) || income <= 0) {
+        resultDiv.textContent = "Please enter a valid income.";
+        return;
+      }
+      const years = bezosNetWorth / income;
+      resultDiv.textContent = `Years needed: ${years.toLocaleString(undefined, {maximumFractionDigits: 2})}`;
+    });
+  </script>
 </body>
 </html>
