@@ -2,18 +2,18 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Bezos Blaster</title>
+  <title>Bezos Blaster: Tax Evasion Edition</title>
   <style>
     body {
       margin: 0;
       overflow: hidden;
-      background: black;
-      font-family: sans-serif;
+      background: #000;
       color: white;
+      font-family: 'Arial', sans-serif;
     }
     canvas {
       display: block;
-      background: linear-gradient(to top, #000000, #111133);
+      background: linear-gradient(#000011, #000033);
     }
     #score {
       position: absolute;
@@ -22,11 +22,22 @@
       font-size: 24px;
       font-weight: bold;
     }
+    #quote {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      font-size: 16px;
+      max-width: 250px;
+      text-align: right;
+      font-style: italic;
+    }
   </style>
 </head>
 <body>
-  <div id="score">💸 Score: 0</div>
+  <div id="score">📦 Revenue: $0</div>
+  <div id="quote"></div>
   <canvas id="gameCanvas" width="800" height="600"></canvas>
+
   <script>
     const canvas = document.getElementById('gameCanvas');
     const ctx = canvas.getContext('2d');
@@ -34,28 +45,41 @@
     let player = { x: 400, y: 500, size: 40 };
     let keys = {};
     let score = 0;
+    let amazonBoxes = [];
+    let taxAgents = [];
 
-    const money = [];
-    const taxes = [];
+    const bezosQuotes = [
+      "Work hard, have fun, make history.",
+      "Your margin is my opportunity.",
+      "If you do build a great experience, customers will tell each other.",
+      "We are stubborn on vision. We are flexible on details.",
+      "It’s always Day One."
+    ];
 
-    function spawnMoney() {
-      money.push({ x: Math.random() * 760, y: -20 });
+    function randomQuote() {
+      const quote = bezosQuotes[Math.floor(Math.random() * bezosQuotes.length)];
+      document.getElementById('quote').textContent = `"${quote}" — Jeff Bezos`;
     }
 
-    function spawnTax() {
-      taxes.push({ x: Math.random() * 760, y: -20 });
-    }
+    setInterval(randomQuote, 5000);
+    randomQuote();
 
-    function drawRocket(x, y) {
-      ctx.fillStyle = 'blue';
+    function drawBezos(x, y) {
+      ctx.fillStyle = '#f5deb3';
       ctx.beginPath();
-      ctx.moveTo(x, y);
-      ctx.lineTo(x + 20, y + 40);
-      ctx.lineTo(x - 20, y + 40);
-      ctx.closePath();
-      ctx.fill();
-      ctx.fillStyle = 'white';
-      ctx.fillRect(x - 10, y + 10, 20, 20);
+      ctx.arc(x, y, 20, 0, Math.PI * 2);
+      ctx.fill(); // Bezos head
+      ctx.fillStyle = '#000';
+      ctx.font = '16px Arial';
+      ctx.fillText("🧔", x - 10, y + 5); // Bezos emoji face
+    }
+
+    function spawnBox() {
+      amazonBoxes.push({ x: Math.random() * 760, y: -20 });
+    }
+
+    function spawnTaxMan() {
+      taxAgents.push({ x: Math.random() * 760, y: -20 });
     }
 
     function update() {
@@ -67,42 +91,42 @@
       if (keys['ArrowUp'] && player.y > 0) player.y -= 5;
       if (keys['ArrowDown'] && player.y < canvas.height) player.y += 5;
 
-      drawRocket(player.x, player.y);
+      drawBezos(player.x, player.y);
 
-      // Update money
-      for (let i = money.length - 1; i >= 0; i--) {
-        money[i].y += 4;
-        ctx.fillStyle = 'green';
-        ctx.font = '20px Arial';
-        ctx.fillText('$', money[i].x, money[i].y);
-        if (Math.abs(player.x - money[i].x) < 20 && Math.abs(player.y - money[i].y) < 20) {
-          score++;
-          money.splice(i, 1);
-        } else if (money[i].y > canvas.height) {
-          money.splice(i, 1);
+      // Boxes
+      for (let i = amazonBoxes.length - 1; i >= 0; i--) {
+        amazonBoxes[i].y += 3;
+        ctx.font = '22px Arial';
+        ctx.fillStyle = 'orange';
+        ctx.fillText("📦", amazonBoxes[i].x, amazonBoxes[i].y);
+        if (Math.abs(player.x - amazonBoxes[i].x) < 25 && Math.abs(player.y - amazonBoxes[i].y) < 25) {
+          score += 100;
+          amazonBoxes.splice(i, 1);
+        } else if (amazonBoxes[i].y > canvas.height) {
+          amazonBoxes.splice(i, 1);
         }
       }
 
-      // Update taxes
-      for (let i = taxes.length - 1; i >= 0; i--) {
-        taxes[i].y += 6;
+      // Taxes
+      for (let i = taxAgents.length - 1; i >= 0; i--) {
+        taxAgents[i].y += 4;
+        ctx.font = '22px Arial';
         ctx.fillStyle = 'red';
-        ctx.font = '20px Arial';
-        ctx.fillText('💀', taxes[i].x, taxes[i].y);
-        if (Math.abs(player.x - taxes[i].x) < 20 && Math.abs(player.y - taxes[i].y) < 20) {
-          alert('💀 Caught by the IRS! Final Score: ' + score);
+        ctx.fillText("🕵️", taxAgents[i].x, taxAgents[i].y);
+        if (Math.abs(player.x - taxAgents[i].x) < 25 && Math.abs(player.y - taxAgents[i].y) < 25) {
+          alert("💀 Caught by the IRS! Final Revenue: $" + score);
           location.reload();
-        } else if (taxes[i].y > canvas.height) {
-          taxes.splice(i, 1);
+        } else if (taxAgents[i].y > canvas.height) {
+          taxAgents.splice(i, 1);
         }
       }
 
-      document.getElementById('score').textContent = `💸 Score: ${score}`;
+      document.getElementById('score').textContent = `📦 Revenue: $${score}`;
       requestAnimationFrame(update);
     }
 
-    setInterval(spawnMoney, 800);
-    setInterval(spawnTax, 1500);
+    setInterval(spawnBox, 800);
+    setInterval(spawnTaxMan, 1500);
 
     document.addEventListener('keydown', e => keys[e.key] = true);
     document.addEventListener('keyup', e => keys[e.key] = false);
