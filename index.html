@@ -1,69 +1,113 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Jeff Bezos - Wikipedia</title>
+  <meta charset="UTF-8" />
+  <title>Bezos Blaster</title>
   <style>
     body {
+      margin: 0;
+      overflow: hidden;
+      background: black;
       font-family: sans-serif;
-      margin: 2em;
-      background-color: #f9f9f9;
-      color: #202122;
+      color: white;
     }
-    h1, h2, h3 {
-      color: #000;
+    canvas {
+      display: block;
+      background: linear-gradient(to top, #000000, #111133);
     }
-    .infobox {
-      float: right;
-      width: 300px;
-      background-color: #f8f9fa;
-      border: 1px solid #a2a9b1;
-      padding: 1em;
-      margin-left: 1em;
-      font-size: 0.9em;
-    }
-    .infobox img {
-      width: 100%;
-      height: auto;
-    }
-    footer {
-      margin-top: 2em;
-      font-size: 0.8em;
-      color: #555;
+    #score {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      font-size: 24px;
+      font-weight: bold;
     }
   </style>
 </head>
 <body>
-  <h1>Jeff Bezos</h1>
-  <div class="infobox">
-    <img src="https://upload.wikimedia.org/wikipedia/commons/0/0b/Jeff_Bezos_2016.jpg" alt="Jeff Bezos in 2016">
-    <p><strong>Born:</strong> January 12, 1964<br>
-    <strong>Birthplace:</strong> Albuquerque, New Mexico, U.S.<br>
-    <strong>Education:</strong> Princeton University (BSE)<br>
-    <strong>Occupation:</strong> Businessman, media proprietor, investor<br>
-    <strong>Known for:</strong> Founding Amazon, Blue Origin, The Washington Post<br>
-    <strong>Partner:</strong> Lauren Sánchez (2018–present; engaged)<br>
-    <strong>Children:</strong> 4</p>
-  </div>
+  <div id="score">💸 Score: 0</div>
+  <canvas id="gameCanvas" width="800" height="600"></canvas>
+  <script>
+    const canvas = document.getElementById('gameCanvas');
+    const ctx = canvas.getContext('2d');
 
-  <h2>Early Life and Education</h2>
-  <p>Jeffrey Preston Bezos was born on January 12, 1964, in Albuquerque, New Mexico. He graduated from Princeton University in 1986 with degrees in electrical engineering and computer science.</p>
+    let player = { x: 400, y: 500, size: 40 };
+    let keys = {};
+    let score = 0;
 
-  <h2>Career</h2>
-  <h3>Amazon</h3>
-  <p>In 1994, Bezos founded Amazon as an online bookstore. The company expanded into various sectors, becoming the world's largest online retailer and a prominent cloud computing provider through Amazon Web Services.</p>
+    const money = [];
+    const taxes = [];
 
-  <h3>Blue Origin</h3>
-  <p>In 2000, Bezos founded Blue Origin, an aerospace manufacturer and sub-orbital spaceflight services company. In 2021, he flew into space aboard Blue Origin's New Shepard vehicle.</p>
+    function spawnMoney() {
+      money.push({ x: Math.random() * 760, y: -20 });
+    }
 
-  <h3>The Washington Post</h3>
-  <p>In 2013, Bezos purchased The Washington Post for $250 million, revitalizing the newspaper's digital presence.</p>
+    function spawnTax() {
+      taxes.push({ x: Math.random() * 760, y: -20 });
+    }
 
-  <h2>Wealth</h2>
-  <p>As of May 2025, Jeff Bezos's estimated net worth stood at $220.9 billion, making him the third richest individual in the world.</p>
+    function drawRocket(x, y) {
+      ctx.fillStyle = 'blue';
+      ctx.beginPath();
+      ctx.moveTo(x, y);
+      ctx.lineTo(x + 20, y + 40);
+      ctx.lineTo(x - 20, y + 40);
+      ctx.closePath();
+      ctx.fill();
+      ctx.fillStyle = 'white';
+      ctx.fillRect(x - 10, y + 10, 20, 20);
+    }
 
-  <footer>
-    <p>Content adapted from <a href="https://en.wikipedia.org/wiki/Jeff_Bezos">Wikipedia</a> under the <a href="https://creativecommons.org/licenses/by-sa/3.0/">Creative Commons Attribution-ShareAlike License</a>.</p>
-  </footer>
+    function update() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      // Move player
+      if (keys['ArrowLeft'] && player.x > 0) player.x -= 5;
+      if (keys['ArrowRight'] && player.x < canvas.width) player.x += 5;
+      if (keys['ArrowUp'] && player.y > 0) player.y -= 5;
+      if (keys['ArrowDown'] && player.y < canvas.height) player.y += 5;
+
+      drawRocket(player.x, player.y);
+
+      // Update money
+      for (let i = money.length - 1; i >= 0; i--) {
+        money[i].y += 4;
+        ctx.fillStyle = 'green';
+        ctx.font = '20px Arial';
+        ctx.fillText('$', money[i].x, money[i].y);
+        if (Math.abs(player.x - money[i].x) < 20 && Math.abs(player.y - money[i].y) < 20) {
+          score++;
+          money.splice(i, 1);
+        } else if (money[i].y > canvas.height) {
+          money.splice(i, 1);
+        }
+      }
+
+      // Update taxes
+      for (let i = taxes.length - 1; i >= 0; i--) {
+        taxes[i].y += 6;
+        ctx.fillStyle = 'red';
+        ctx.font = '20px Arial';
+        ctx.fillText('💀', taxes[i].x, taxes[i].y);
+        if (Math.abs(player.x - taxes[i].x) < 20 && Math.abs(player.y - taxes[i].y) < 20) {
+          alert('💀 Caught by the IRS! Final Score: ' + score);
+          location.reload();
+        } else if (taxes[i].y > canvas.height) {
+          taxes.splice(i, 1);
+        }
+      }
+
+      document.getElementById('score').textContent = `💸 Score: ${score}`;
+      requestAnimationFrame(update);
+    }
+
+    setInterval(spawnMoney, 800);
+    setInterval(spawnTax, 1500);
+
+    document.addEventListener('keydown', e => keys[e.key] = true);
+    document.addEventListener('keyup', e => keys[e.key] = false);
+
+    update();
+  </script>
 </body>
 </html>
