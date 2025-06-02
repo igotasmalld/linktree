@@ -2,151 +2,85 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Amazon Package Panic!</title>
+  <title>Prime Clicker</title>
   <style>
     body {
-      margin: 0;
-      background: #f0f0f0;
-      font-family: sans-serif;
-      overflow: hidden;
-    }
-    #game {
-      position: relative;
-      width: 100%;
-      height: 100vh;
-      background: linear-gradient(#fff, #ccc);
-      overflow: hidden;
-    }
-    #worker {
-      position: absolute;
-      bottom: 10px;
-      left: 50%;
-      width: 80px;
-      height: 80px;
-      background: orange;
-      border-radius: 20px;
-      transform: translateX(-50%);
+      font-family: Arial, sans-serif;
+      background: linear-gradient(#f3f3f3, #e3e3e3);
       text-align: center;
-      font-weight: bold;
-      line-height: 80px;
-      color: white;
-      font-size: 20px;
+      padding-top: 50px;
     }
-    .package {
-      position: absolute;
-      top: 0;
-      width: 40px;
-      height: 40px;
-      background: brown;
-      border-radius: 5px;
-      animation: fall 5s linear;
-      color: white;
-      text-align: center;
-      line-height: 40px;
-      font-size: 12px;
+    h1 {
+      color: #232f3e;
     }
-    @keyframes fall {
-      0% { top: 0; }
-      100% { top: 100%; }
+    #package {
+      font-size: 100px;
+      cursor: pointer;
+      transition: transform 0.1s;
     }
-    #scoreboard {
-      position: absolute;
-      top: 10px;
-      left: 10px;
+    #package:active {
+      transform: scale(0.95);
+    }
+    #score {
+      font-size: 24px;
+      margin: 20px 0;
+    }
+    #upgrade {
+      margin-top: 20px;
+      padding: 10px 20px;
+      background-color: #ff9900;
+      border: none;
       font-size: 18px;
+      cursor: pointer;
+      border-radius: 5px;
     }
-    #message {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      font-size: 32px;
-      background: yellow;
-      padding: 20px;
-      border: 3px dashed red;
-      display: none;
+    #upgrade:disabled {
+      background-color: #999;
+      cursor: not-allowed;
     }
   </style>
 </head>
 <body>
-  <div id="game">
-    <div id="worker">📦</div>
-    <div id="scoreboard">Caught: 0 | Missed: 0</div>
-    <div id="message"></div>
-  </div>
+  <h1>📦 Prime Clicker</h1>
+  <div id="package">📦</div>
+  <div id="score">Amazon Points: 0</div>
+  <button id="upgrade" disabled>Buy Robot (100 Points)</button>
 
   <script>
-    const game = document.getElementById('game');
-    const worker = document.getElementById('worker');
-    const scoreboard = document.getElementById('scoreboard');
-    const message = document.getElementById('message');
+    let points = 0;
+    let autoClicker = false;
 
-    let caught = 0;
-    let missed = 0;
+    const package = document.getElementById("package");
+    const score = document.getElementById("score");
+    const upgrade = document.getElementById("upgrade");
 
-    // Move worker
-    document.addEventListener('keydown', (e) => {
-      let left = parseInt(window.getComputedStyle(worker).left);
-      if (e.key === 'ArrowLeft') {
-        worker.style.left = Math.max(left - 30, 0) + 'px';
-      } else if (e.key === 'ArrowRight') {
-        worker.style.left = Math.min(left + 30, game.clientWidth - 80) + 'px';
+    package.addEventListener("click", () => {
+      points++;
+      updateScore();
+    });
+
+    upgrade.addEventListener("click", () => {
+      if (points >= 100) {
+        points -= 100;
+        autoClicker = true;
+        upgrade.disabled = true;
+        upgrade.textContent = "Robot Working 🤖";
+        updateScore();
+        setInterval(() => {
+          if (autoClicker) {
+            points++;
+            updateScore();
+          }
+        }, 1000);
       }
     });
 
-    // Drop packages
-    function dropPackage() {
-      const pkg = document.createElement('div');
-      pkg.className = 'package';
-      pkg.style.left = Math.random() * (game.clientWidth - 40) + 'px';
-      pkg.textContent = "📦";
-      game.appendChild(pkg);
-
-      const pkgInterval = setInterval(() => {
-        const pkgRect = pkg.getBoundingClientRect();
-        const workerRect = worker.getBoundingClientRect();
-
-        if (pkgRect.bottom >= game.clientHeight - 10) {
-          if (
-            pkgRect.left < workerRect.right &&
-            pkgRect.right > workerRect.left
-          ) {
-            caught++;
-          } else {
-            missed++;
-            funnyAlert(missed);
-          }
-          scoreboard.textContent = `Caught: ${caught} | Missed: ${missed}`;
-          clearInterval(pkgInterval);
-          game.removeChild(pkg);
-          if (missed >= 5) endGame();
-        }
-      }, 50);
-
-      setTimeout(dropPackage, Math.random() * 1500 + 500);
-    }
-
-    // End game
-    function endGame() {
-      message.textContent = "YOU'RE FIRED! 🔥";
-      message.style.display = 'block';
-    }
-
-    // Funny alerts
-    function funnyAlert(count) {
-      const phrases = [
-        "Oops! That one’s going to Ohio!",
-        "Jeff Bezos is watching...",
-        "Package lost. Hope it wasn't a PS5!",
-        "Your manager saw that.",
-        "You dropped grandma’s blender!",
-      ];
-      if (count <= 5) {
-        alert(phrases[count - 1] || "Another one bites the dust!");
+    function updateScore() {
+      score.textContent = `Amazon Points: ${points}`;
+      if (points >= 100 && !autoClicker) {
+        upgrade.disabled = false;
       }
     }
-
-    dropPackage(); // Start the game
   </script>
 </body>
 </html>
