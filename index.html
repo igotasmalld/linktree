@@ -1,8 +1,8 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="it">
 <head>
   <meta charset="UTF-8">
-  <title>Catch Jeff Bezos!</title>
+  <title>Acchiappa Jeff Bezos!</title>
   <style>
     body {
       margin: 0;
@@ -20,14 +20,17 @@
 
     .bezos {
       position: absolute;
-      width: 60px;
-      height: 60px;
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      object-fit: cover;
       cursor: pointer;
       transition: transform 0.1s;
+      border: 2px solid white;
     }
 
     .bezos:active {
-      transform: scale(0.95);
+      transform: scale(0.9);
     }
 
     #scoreboard {
@@ -52,7 +55,7 @@
 </head>
 <body>
   <div id="game">
-    <div id="scoreboard">Score: 0 | Misses: 0</div>
+    <div id="scoreboard">Punteggio: 0 | Errori: 0</div>
     <div id="gameOver">GAME OVER 💸</div>
   </div>
 
@@ -76,10 +79,10 @@
 
       bezos = document.createElement('img');
       bezos.classList.add('bezos');
-      bezos.src = "https://upload.wikimedia.org/wikipedia/commons/4/4f/Jeff_Bezos%27_iconic_laugh_crop.png"; // transparent PNG
+      bezos.src = "https://i.imgur.com/IjNdM6X.jpg"; // Foto chiara e rotonda di Jeff Bezos
 
-      const x = Math.random() * (window.innerWidth - 60);
-      const y = Math.random() * (window.innerHeight - 60);
+      const x = Math.random() * (window.innerWidth - 80);
+      const y = Math.random() * (window.innerHeight - 80);
       bezos.style.left = `${x}px`;
       bezos.style.top = `${y}px`;
 
@@ -94,7 +97,7 @@
     }
 
     function updateScore() {
-      scoreboard.textContent = `Score: ${score} | Misses: ${misses}`;
+      scoreboard.textContent = `Punteggio: ${score} | Errori: ${misses}`;
     }
 
     function checkGameOver() {
