@@ -2,78 +2,68 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Δ13-X</title>
+  <title>Jeff Bezos - Wikipedia</title>
   <style>
     body {
-      background: black;
-      color: #00ff99;
-      font-family: monospace;
-      padding: 2em;
-      overflow: hidden;
+      font-family: sans-serif;
+      margin: 2em;
+      background-color: #f9f9f9;
+      color: #202122;
     }
-    #c0d3 {
-      white-space: pre-wrap;
-      word-break: break-word;
+    h1, h2, h3 {
+      color: #000;
     }
-    .h1d3 {
-      display: none;
+    .infobox {
+      float: right;
+      width: 300px;
+      background-color: #f8f9fa;
+      border: 1px solid #a2a9b1;
+      padding: 1em;
+      margin-left: 1em;
+      font-size: 0.9em;
     }
-    canvas {
-      position: absolute;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
-      z-index: -1;
+    .infobox img {
+      width: 100%;
+      height: auto;
+    }
+    footer {
+      margin-top: 2em;
+      font-size: 0.8em;
+      color: #555;
     }
   </style>
 </head>
 <body>
-  <!-- ? 𝚡𝟷𝟹𝐹: Initiate Lock Sequence -->
-  <canvas id="matrix"></canvas>
-  <div id="c0d3"></div>
+  <h1>Jeff Bezos</h1>
+  <div class="infobox">
+    <img src="https://upload.wikimedia.org/wikipedia/commons/0/0b/Jeff_Bezos_2016.jpg" alt="Jeff Bezos in 2016">
+    <p><strong>Born:</strong> January 12, 1964<br>
+    <strong>Birthplace:</strong> Albuquerque, New Mexico, U.S.<br>
+    <strong>Education:</strong> Princeton University (BSE)<br>
+    <strong>Occupation:</strong> Businessman, media proprietor, investor<br>
+    <strong>Known for:</strong> Founding Amazon, Blue Origin, The Washington Post<br>
+    <strong>Partner:</strong> Lauren Sánchez (2018–present; engaged)<br>
+    <strong>Children:</strong> 4</p>
+  </div>
 
-  <script>
-    // QWx3YXlzIGxvb2sgYmV5b25kIHRoZSBzdXJmYWNlLg== (base64)
+  <h2>Early Life and Education</h2>
+  <p>Jeffrey Preston Bezos was born on January 12, 1964, in Albuquerque, New Mexico. He graduated from Princeton University in 1986 with degrees in electrical engineering and computer science.</p>
 
-    const msg = atob("SGVsbG8sIHRyYXZlbGVyLiBZb3UgZm91bmQgdGhlIGZpcnN0IGxheWVyLg==");
-    const coded = "01001000 01100101 01101100 01101100 01101111";
-    document.getElementById("c0d3").textContent = coded;
+  <h2>Career</h2>
+  <h3>Amazon</h3>
+  <p>In 1994, Bezos founded Amazon as an online bookstore. The company expanded into various sectors, becoming the world's largest online retailer and a prominent cloud computing provider through Amazon Web Services.</p>
 
-    // Matrix Rain Effect
-    const canvas = document.getElementById("matrix");
-    const ctx = canvas.getContext("2d");
+  <h3>Blue Origin</h3>
+  <p>In 2000, Bezos founded Blue Origin, an aerospace manufacturer and sub-orbital spaceflight services company. In 2021, he flew into space aboard Blue Origin's New Shepard vehicle.</p>
 
-    canvas.height = window.innerHeight;
-    canvas.width = window.innerWidth;
+  <h3>The Washington Post</h3>
+  <p>In 2013, Bezos purchased The Washington Post for $250 million, revitalizing the newspaper's digital presence.</p>
 
-    let letters = Array(256).join("01").split("");
-    let fontSize = 12;
-    let columns = canvas.width / fontSize;
+  <h2>Wealth</h2>
+  <p>As of May 2025, Jeff Bezos's estimated net worth stood at $220.9 billion, making him the third richest individual in the world.</p>
 
-    let drops = [];
-    for (let i = 0; i < columns; i++) drops[i] = 1;
-
-    function draw() {
-      ctx.fillStyle = "rgba(0, 0, 0, 0.05)";
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
-      ctx.fillStyle = "#0F0";
-      ctx.font = fontSize + "px monospace";
-
-      for (let i = 0; i < drops.length; i++) {
-        let text = letters[Math.floor(Math.random() * letters.length)];
-        ctx.fillText(text, i * fontSize, drops[i] * fontSize);
-
-        if (drops[i] * fontSize > canvas.height && Math.random() > 0.975)
-          drops[i] = 0;
-        drops[i]++;
-      }
-    }
-
-    setInterval(draw, 33);
-
-    // (decode after 5 seconds)
-    setTimeout(() => {
-      document.getElementById("c0d3").textContent = msg;
-    }, 5000);
-  </script>
+  <footer>
+    <p>Content adapted from <a href="https://en.wikipedia.org/wiki/Jeff_Bezos">Wikipedia</a> under the <a href="https://creativecommons.org/licenses/by-sa/3.0/">Creative Commons Attribution-ShareAlike License</a>.</p>
+  </footer>
 </body>
 </html>
