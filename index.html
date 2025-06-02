@@ -7,19 +7,20 @@
   <style>
     body {
       font-family: Arial, sans-serif;
-      background: #f4f4f4;
+      background: #f2f2f2;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
       min-height: 100vh;
+      margin: 0;
       padding: 20px;
     }
     .container {
       background: white;
       padding: 2rem;
-      border-radius: 10px;
-      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+      border-radius: 12px;
+      box-shadow: 0 5px 20px rgba(0,0,0,0.1);
       max-width: 400px;
       width: 100%;
       text-align: center;
@@ -28,6 +29,7 @@
       padding: 10px;
       width: 100%;
       font-size: 1rem;
+      margin-top: 10px;
       margin-bottom: 1rem;
       border: 1px solid #ccc;
       border-radius: 5px;
@@ -38,7 +40,7 @@
       margin-top: 1rem;
     }
     .note {
-      font-size: 0.9rem;
+      font-size: 0.85rem;
       color: #666;
       margin-top: 0.5rem;
     }
@@ -47,24 +49,24 @@
 <body>
   <div class="container">
     <h1>Bezos Net Worth Calculator</h1>
-    <p>Enter your annual income:</p>
-    <input type="number" id="income" placeholder="e.g., 50000" />
+    <p>Enter your <strong>monthly</strong> income:</p>
+    <input type="number" id="income" placeholder="e.g., 3000" />
     <div class="result" id="result">Years needed: –</div>
-    <div class="note">Assumes Jeff Bezos's net worth is $203 billion.</div>
+    <div class="note">Assumes Jeff Bezos's net worth is $220 billion.</div>
   </div>
 
   <script>
-    const bezosNetWorth = 203_000_000_000;
+    const bezosNetWorth = 220_000_000_000;
     const input = document.getElementById("income");
     const resultDiv = document.getElementById("result");
 
     input.addEventListener("input", () => {
-      const income = parseFloat(input.value);
-      if (isNaN(income) || income <= 0) {
+      const monthlyIncome = parseFloat(input.value);
+      if (isNaN(monthlyIncome) || monthlyIncome <= 0) {
         resultDiv.textContent = "Please enter a valid income.";
         return;
       }
-      const years = bezosNetWorth / income;
+      const years = bezosNetWorth / (monthlyIncome * 12);
       resultDiv.textContent = `Years needed: ${years.toLocaleString(undefined, {maximumFractionDigits: 2})}`;
     });
   </script>
