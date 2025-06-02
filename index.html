@@ -2,85 +2,109 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Prime Clicker</title>
+  <title>Catch the Dot!</title>
   <style>
     body {
+      margin: 0;
+      overflow: hidden;
       font-family: Arial, sans-serif;
-      background: linear-gradient(#f3f3f3, #e3e3e3);
-      text-align: center;
-      padding-top: 50px;
+      background: #222;
+      color: white;
     }
-    h1 {
-      color: #232f3e;
+
+    #game {
+      position: relative;
+      width: 100vw;
+      height: 100vh;
     }
-    #package {
-      font-size: 100px;
+
+    .dot {
+      position: absolute;
+      width: 40px;
+      height: 40px;
+      background: red;
+      border-radius: 50%;
       cursor: pointer;
-      transition: transform 0.1s;
     }
-    #package:active {
-      transform: scale(0.95);
+
+    #scoreboard {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      font-size: 20px;
     }
-    #score {
-      font-size: 24px;
-      margin: 20px 0;
-    }
-    #upgrade {
-      margin-top: 20px;
-      padding: 10px 20px;
-      background-color: #ff9900;
-      border: none;
-      font-size: 18px;
-      cursor: pointer;
-      border-radius: 5px;
-    }
-    #upgrade:disabled {
-      background-color: #999;
-      cursor: not-allowed;
+
+    #gameOver {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 36px;
+      background: yellow;
+      color: black;
+      padding: 20px;
+      display: none;
     }
   </style>
 </head>
 <body>
-  <h1>📦 Prime Clicker</h1>
-  <div id="package">📦</div>
-  <div id="score">Amazon Points: 0</div>
-  <button id="upgrade" disabled>Buy Robot (100 Points)</button>
+  <div id="game">
+    <div id="scoreboard">Score: 0 | Misses: 0</div>
+    <div id="gameOver">GAME OVER 💥</div>
+  </div>
 
   <script>
-    let points = 0;
-    let autoClicker = false;
+    const game = document.getElementById('game');
+    const scoreboard = document.getElementById('scoreboard');
+    const gameOverText = document.getElementById('gameOver');
 
-    const package = document.getElementById("package");
-    const score = document.getElementById("score");
-    const upgrade = document.getElementById("upgrade");
+    let score = 0;
+    let misses = 0;
+    let dot = null;
+    let timer = null;
 
-    package.addEventListener("click", () => {
-      points++;
-      updateScore();
-    });
-
-    upgrade.addEventListener("click", () => {
-      if (points >= 100) {
-        points -= 100;
-        autoClicker = true;
-        upgrade.disabled = true;
-        upgrade.textContent = "Robot Working 🤖";
+    function spawnDot() {
+      // Remove old dot (missed)
+      if (dot) {
+        game.removeChild(dot);
+        misses++;
         updateScore();
-        setInterval(() => {
-          if (autoClicker) {
-            points++;
-            updateScore();
-          }
-        }, 1000);
+        checkGameOver();
       }
-    });
+
+      // Create new dot
+      dot = document.createElement('div');
+      dot.classList.add('dot');
+
+      const x = Math.random() * (window.innerWidth - 40);
+      const y = Math.random() * (window.innerHeight - 40);
+      dot.style.left = `${x}px`;
+      dot.style.top = `${y}px`;
+
+      dot.addEventListener('click', () => {
+        score++;
+        updateScore();
+        game.removeChild(dot);
+        dot = null;
+      });
+
+      game.appendChild(dot);
+    }
 
     function updateScore() {
-      score.textContent = `Amazon Points: ${points}`;
-      if (points >= 100 && !autoClicker) {
-        upgrade.disabled = false;
+      scoreboard.textContent = `Score: ${score} | Misses: ${misses}`;
+    }
+
+    function checkGameOver() {
+      if (misses >= 5) {
+        clearInterval(timer);
+        if (dot) game.removeChild(dot);
+        gameOverText.style.display = 'block';
       }
     }
+
+    // Start game
+    timer = setInterval(spawnDot, 1000);
   </script>
 </body>
 </html>
