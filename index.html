@@ -2,14 +2,49 @@
 <html lang="it">
 <head>
   <meta charset="UTF-8">
-  <title>Acchiappa Jeff Bezos!</title>
+  <title>Acchiappa il Pacco Amazon!</title>
   <style>
     body {
       margin: 0;
-      overflow: hidden;
       font-family: Arial, sans-serif;
-      background: #111;
+      overflow: hidden;
+      background: url('https://images.unsplash.com/photo-1605902711622-cfb43c4437d1?auto=format&fit=crop&w=1950&q=80') no-repeat center center fixed;
+      background-size: cover;
       color: white;
+    }
+
+    #startScreen, #gameOver {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.85);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      z-index: 10;
+    }
+
+    #startScreen h1 {
+      font-size: 48px;
+      margin-bottom: 20px;
+    }
+
+    #startScreen p {
+      font-size: 20px;
+      max-width: 600px;
+    }
+
+    #startBtn {
+      margin-top: 20px;
+      padding: 10px 20px;
+      font-size: 20px;
+      cursor: pointer;
+      background: orange;
+      border: none;
+      border-radius: 8px;
+      color: black;
     }
 
     #game {
@@ -18,19 +53,17 @@
       height: 100vh;
     }
 
-    .bezos {
+    .package {
       position: absolute;
       width: 80px;
       height: 80px;
-      border-radius: 50%;
-      object-fit: cover;
+      object-fit: contain;
       cursor: pointer;
       transition: transform 0.1s;
-      border: 2px solid white;
     }
 
-    .bezos:active {
-      transform: scale(0.9);
+    .package:active {
+      transform: scale(0.95);
     }
 
     #scoreboard {
@@ -38,79 +71,117 @@
       top: 10px;
       left: 10px;
       font-size: 20px;
+      background-color: rgba(0,0,0,0.6);
+      padding: 8px 12px;
+      border-radius: 8px;
     }
 
-    #gameOver {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      font-size: 36px;
-      background: yellow;
+    #gameOver h2 {
+      font-size: 40px;
+      color: yellow;
+    }
+
+    #restartBtn {
+      padding: 10px 20px;
+      font-size: 18px;
+      background: orange;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      margin-top: 20px;
       color: black;
-      padding: 20px;
-      display: none;
     }
   </style>
 </head>
 <body>
-  <div id="game">
-    <div id="scoreboard">Punteggio: 0 | Errori: 0</div>
-    <div id="gameOver">GAME OVER 💸</div>
-  </div>
 
-  <script>
-    const game = document.getElementById('game');
-    const scoreboard = document.getElementById('scoreboard');
-    const gameOverText = document.getElementById('gameOver');
+<div id="startScreen">
+  <h1>📦 Acchiappa il Pacco Amazon!</h1>
+  <p>
+    I pacchi stanno apparendo ovunque nel magazzino Amazon! <br><br>
+    Il tuo compito è cliccarli il più velocemente possibile. <br>
+    Se ne manchi 5... GAME OVER!<br><br>
+    Riesci a fare più di 20 punti?
+  </p>
+  <button id="startBtn">Inizia il Gioco</button>
+</div>
 
-    let score = 0;
-    let misses = 0;
-    let bezos = null;
-    let timer = null;
+<div id="game">
+  <div id="scoreboard">Punteggio: 0 | Mancati: 0</div>
+</div>
 
-    function spawnBezos() {
-      if (bezos) {
-        game.removeChild(bezos);
-        misses++;
-        updateScore();
-        checkGameOver();
-      }
+<div id="gameOver" style="display: none;">
+  <h2>💥 GAME OVER 💥</h2>
+  <p>Hai mancato 5 pacchi!</p>
+  <button id="restartBtn">Rigioca</button>
+</div>
 
-      bezos = document.createElement('img');
-      bezos.classList.add('bezos');
+<script>
+  const game = document.getElementById('game');
+  const scoreboard = document.getElementById('scoreboard');
+  const gameOverScreen = document.getElementById('gameOver');
+  const startScreen = document.getElementById('startScreen');
+  const startBtn = document.getElementById('startBtn');
+  const restartBtn = document.getElementById('restartBtn');
 
-      // Immagine fissa e funzionante di Jeff Bezos
-      bezos.src = "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4a/Jeff_Bezos%27s_iconic_laugh.jpg/200px-Jeff_Bezos%27s_iconic_laugh.jpg";
+  let score = 0;
+  let misses = 0;
+  let packageImg = null;
+  let timer = null;
 
-      const x = Math.random() * (window.innerWidth - 80);
-      const y = Math.random() * (window.innerHeight - 80);
-      bezos.style.left = `${x}px`;
-      bezos.style.top = `${y}px`;
+  const packageURL = "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4e/Amazon_Package.jpg/320px-Amazon_Package.jpg";
 
-      bezos.addEventListener('click', () => {
-        score++;
-        updateScore();
-        game.removeChild(bezos);
-        bezos = null;
-      });
-
-      game.appendChild(bezos);
+  function spawnPackage() {
+    if (packageImg) {
+      game.removeChild(packageImg);
+      misses++;
+      updateScore();
+      checkGameOver();
     }
 
-    function updateScore() {
-      scoreboard.textContent = `Punteggio: ${score} | Errori: ${misses}`;
-    }
+    packageImg = document.createElement('img');
+    packageImg.classList.add('package');
+    packageImg.src = packageURL;
 
-    function checkGameOver() {
-      if (misses >= 5) {
-        clearInterval(timer);
-        if (bezos) game.removeChild(bezos);
-        gameOverText.style.display = 'block';
-      }
-    }
+    const x = Math.random() * (window.innerWidth - 80);
+    const y = Math.random() * (window.innerHeight - 80);
+    packageImg.style.left = `${x}px`;
+    packageImg.style.top = `${y}px`;
 
-    timer = setInterval(spawnBezos, 1000);
-  </script>
+    packageImg.addEventListener('click', () => {
+      score++;
+      updateScore();
+      game.removeChild(packageImg);
+      packageImg = null;
+    });
+
+    game.appendChild(packageImg);
+  }
+
+  function updateScore() {
+    scoreboard.textContent = `Punteggio: ${score} | Mancati: ${misses}`;
+  }
+
+  function checkGameOver() {
+    if (misses >= 5) {
+      clearInterval(timer);
+      if (packageImg) game.removeChild(packageImg);
+      gameOverScreen.style.display = 'flex';
+    }
+  }
+
+  function startGame() {
+    score = 0;
+    misses = 0;
+    updateScore();
+    gameOverScreen.style.display = 'none';
+    startScreen.style.display = 'none';
+    timer = setInterval(spawnPackage, 1000);
+  }
+
+  startBtn.addEventListener('click', startGame);
+  restartBtn.addEventListener('click', startGame);
+</script>
+
 </body>
 </html>
