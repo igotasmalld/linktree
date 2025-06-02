@@ -1,171 +1,203 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>Amazon Box Clicker</title>
-  <style>
-    html, body {
-      margin: 0;
-      padding: 0;
-      overflow: hidden;
-      font-family: Arial, sans-serif;
-      background: linear-gradient(to top, #111, #333);
-      color: white;
-      user-select: none;
-    }
-
-    #score {
-      position: absolute;
-      top: 10px;
-      left: 20px;
-      font-size: 24px;
-      font-weight: bold;
-      z-index: 10;
-    }
-
-    #gameCanvas {
-      display: block;
-      background: #1a1a1a;
-    }
-
-    #gameOver {
-      position: absolute;
-      top: 40%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      font-size: 32px;
-      background: rgba(0, 0, 0, 0.85);
-      padding: 30px;
-      border: 2px solid #f90;
-      border-radius: 10px;
-      display: none;
-      text-align: center;
-      z-index: 20;
-      width: 300px;
-    }
-
-    button {
-      margin-top: 15px;
-      padding: 10px 20px;
-      font-size: 18px;
-      background: #f90;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-      color: #111;
-      font-weight: bold;
-    }
-  </style>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Amazon Clicker</title>
+<style>
+  body {
+    background: linear-gradient(to bottom, #131921, #232f3e);
+    color: #fff;
+    font-family: Arial, sans-serif;
+    text-align: center;
+    margin: 0;
+    padding: 20px;
+  }
+  h1 {
+    margin-bottom: 10px;
+    font-weight: 900;
+  }
+  #box {
+    margin: 20px auto;
+    width: 150px;
+    height: 150px;
+    background-image: url('https://upload.wikimedia.org/wikipedia/commons/thumb/a/a9/Amazon_box.svg/320px-Amazon_box.svg.png');
+    background-size: contain;
+    background-repeat: no-repeat;
+    cursor: pointer;
+    transition: transform 0.1s ease;
+  }
+  #box:active {
+    transform: scale(0.9);
+  }
+  #revenue {
+    font-size: 24px;
+    margin-top: 15px;
+    font-weight: bold;
+  }
+  #upgrades {
+    margin-top: 40px;
+    max-width: 500px;
+    margin-left: auto;
+    margin-right: auto;
+    text-align: left;
+  }
+  .upgrade {
+    background: #232f3e;
+    margin-bottom: 10px;
+    padding: 10px;
+    border-radius: 8px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+    transition: background 0.2s ease;
+  }
+  .upgrade:hover {
+    background: #37475a;
+  }
+  .upgrade button {
+    background: #febd69;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: 700;
+    color: #111;
+    transition: background 0.2s ease;
+  }
+  .upgrade button:disabled {
+    background: #555;
+    cursor: not-allowed;
+  }
+  .upgrade-description {
+    flex-grow: 1;
+    margin-left: 10px;
+  }
+</style>
 </head>
 <body>
-  <div id="score">📦 Score: 0</div>
-  <canvas id="gameCanvas" width="800" height="600"></canvas>
-  <div id="gameOver">
-    <p>💀 Too many boxes missed!</p>
-    <p id="finalScore"></p>
-    <button onclick="restartGame()">Play Again</button>
-  </div>
 
-  <script>
-    const canvas = document.getElementById("gameCanvas");
-    const ctx = canvas.getContext("2d");
-    const scoreEl = document.getElementById("score");
-    const gameOverEl = document.getElementById("gameOver");
-    const finalScoreEl = document.getElementById("finalScore");
+<h1>Amazon Clicker</h1>
+<div id="box" title="Click me to earn revenue!"></div>
+<div id="revenue">Revenue: $0</div>
 
-    const boxImg = new Image();
-    boxImg.src = "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a9/Amazon_box.svg/320px-Amazon_box.svg.png";
+<div id="upgrades">
+  <h2>Upgrades</h2>
+  <!-- Upgrades will go here -->
+</div>
 
-    let boxes = [];
-    let score = 0;
-    let missed = 0;
-    let gameRunning = true;
-    let speedMultiplier = 1;
+<script>
+  // Game state
+  let revenue = 0;
+  let revenuePerClick = 1;
+  let revenuePerSecond = 0;
 
-    // Spawn a box every second
-    function spawnBox() {
-      if (!gameRunning) return;
-      boxes.push({
-        x: Math.random() * (canvas.width - 60),
-        y: -60,
-        size: 60,
-        speed: 2 + Math.random() * 2 * speedMultiplier
-      });
+  // Upgrades definitions
+  const upgrades = [
+    {
+      name: "Warehouse Automation",
+      description: "Automatically generate $2 revenue per second.",
+      cost: 50,
+      revenuePerSecond: 2,
+      count: 0
+    },
+    {
+      name: "Delivery Drones",
+      description: "Automatically generate $10 revenue per second.",
+      cost: 200,
+      revenuePerSecond: 10,
+      count: 0
+    },
+    {
+      name: "Prime Membership",
+      description: "Increase revenue per click by 5.",
+      cost: 100,
+      revenuePerClickIncrease: 5,
+      count: 0
+    },
+    {
+      name: "Amazon Web Services",
+      description: "Generate $50 revenue per second.",
+      cost: 1000,
+      revenuePerSecond: 50,
+      count: 0
     }
+  ];
 
-    // Game update loop
-    function update() {
-      if (!gameRunning) return;
+  // Elements
+  const box = document.getElementById('box');
+  const revenueEl = document.getElementById('revenue');
+  const upgradesEl = document.getElementById('upgrades');
 
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
+  // Update revenue display
+  function updateRevenueDisplay() {
+    revenueEl.textContent = `Revenue: $${Math.floor(revenue).toLocaleString()}`;
+  }
 
-      for (let i = boxes.length - 1; i >= 0; i--) {
-        const box = boxes[i];
-        box.y += box.speed;
+  // Click handler
+  box.addEventListener('click', () => {
+    revenue += revenuePerClick;
+    updateRevenueDisplay();
+  });
 
-        ctx.drawImage(boxImg, box.x, box.y, box.size, box.size);
+  // Build upgrade UI
+  upgrades.forEach((upgrade, index) => {
+    const div = document.createElement('div');
+    div.className = 'upgrade';
+    div.title = upgrade.description;
 
-        if (box.y > canvas.height) {
-          boxes.splice(i, 1);
-          missed++;
-          if (missed >= 5) {
-            endGame();
-            return;
-          }
+    const desc = document.createElement('div');
+    desc.className = 'upgrade-description';
+    desc.innerHTML = `<strong>${upgrade.name}</strong><br>${upgrade.description}<br>Owned: <span id="count-${index}">0</span>`;
+
+    const btn = document.createElement('button');
+    btn.textContent = `Buy ($${upgrade.cost})`;
+    btn.id = `buy-btn-${index}`;
+
+    btn.addEventListener('click', () => {
+      if (revenue >= upgrade.cost) {
+        revenue -= upgrade.cost;
+        upgrade.count++;
+        if (upgrade.revenuePerSecond) {
+          revenuePerSecond += upgrade.revenuePerSecond;
         }
-      }
-
-      scoreEl.textContent = `📦 Score: ${score}`;
-
-      requestAnimationFrame(update);
-    }
-
-    // Click handler
-    canvas.addEventListener("click", e => {
-      if (!gameRunning) return;
-
-      const rect = canvas.getBoundingClientRect();
-      const mouseX = e.clientX - rect.left;
-      const mouseY = e.clientY - rect.top;
-
-      for (let i = boxes.length - 1; i >= 0; i--) {
-        const box = boxes[i];
-        if (
-          mouseX >= box.x &&
-          mouseX <= box.x + box.size &&
-          mouseY >= box.y &&
-          mouseY <= box.y + box.size
-        ) {
-          boxes.splice(i, 1);
-          score++;
-          speedMultiplier += 0.05; // Increase difficulty slightly
-          return;
+        if (upgrade.revenuePerClickIncrease) {
+          revenuePerClick += upgrade.revenuePerClickIncrease;
         }
+        // Increase cost exponentially
+        upgrade.cost = Math.floor(upgrade.cost * 1.5);
+        btn.textContent = `Buy ($${upgrade.cost})`;
+        document.getElementById(`count-${index}`).textContent = upgrade.count;
+        updateRevenueDisplay();
+        updateButtons();
       }
     });
 
-    function endGame() {
-      gameRunning = false;
-      gameOverEl.style.display = "block";
-      finalScoreEl.textContent = `Final Score: ${score}`;
-    }
+    div.appendChild(desc);
+    div.appendChild(btn);
+    upgradesEl.appendChild(div);
+  });
 
-    function restartGame() {
-      score = 0;
-      missed = 0;
-      boxes = [];
-      speedMultiplier = 1;
-      gameRunning = true;
-      gameOverEl.style.display = "none";
-      update();
-    }
+  // Update buttons disabled state
+  function updateButtons() {
+    upgrades.forEach((upgrade, index) => {
+      const btn = document.getElementById(`buy-btn-${index}`);
+      btn.disabled = revenue < upgrade.cost;
+    });
+  }
 
-    boxImg.onload = () => {
-      update();
-      setInterval(() => {
-        if (gameRunning) spawnBox();
-      }, 1000);
-    };
-  </script>
+  // Auto revenue loop every second
+  setInterval(() => {
+    revenue += revenuePerSecond;
+    updateRevenueDisplay();
+    updateButtons();
+  }, 1000);
+
+  // Initial display update
+  updateRevenueDisplay();
+  updateButtons();
+</script>
+
 </body>
 </html>
