@@ -1,203 +1,280 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" >
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Amazon Clicker</title>
-<style>
-  body {
-    background: linear-gradient(to bottom, #131921, #232f3e);
-    color: #fff;
-    font-family: Arial, sans-serif;
-    text-align: center;
-    margin: 0;
-    padding: 20px;
-  }
-  h1 {
-    margin-bottom: 10px;
-    font-weight: 900;
-  }
-  #box {
-    margin: 20px auto;
-    width: 150px;
-    height: 150px;
-    background-image: url('https://upload.wikimedia.org/wikipedia/commons/thumb/a/a9/Amazon_box.svg/320px-Amazon_box.svg.png');
-    background-size: contain;
-    background-repeat: no-repeat;
-    cursor: pointer;
-    transition: transform 0.1s ease;
-  }
-  #box:active {
-    transform: scale(0.9);
-  }
-  #revenue {
-    font-size: 24px;
-    margin-top: 15px;
-    font-weight: bold;
-  }
-  #upgrades {
-    margin-top: 40px;
-    max-width: 500px;
-    margin-left: auto;
-    margin-right: auto;
-    text-align: left;
-  }
-  .upgrade {
-    background: #232f3e;
-    margin-bottom: 10px;
-    padding: 10px;
-    border-radius: 8px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    cursor: pointer;
-    transition: background 0.2s ease;
-  }
-  .upgrade:hover {
-    background: #37475a;
-  }
-  .upgrade button {
-    background: #febd69;
-    border: none;
-    padding: 8px 15px;
-    border-radius: 5px;
-    cursor: pointer;
-    font-weight: 700;
-    color: #111;
-    transition: background 0.2s ease;
-  }
-  .upgrade button:disabled {
-    background: #555;
-    cursor: not-allowed;
-  }
-  .upgrade-description {
-    flex-grow: 1;
-    margin-left: 10px;
-  }
-</style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Amazon Clicker Deluxe</title>
+  <style>
+    /* Reset & base */
+    * {
+      box-sizing: border-box;
+    }
+    body {
+      margin: 0;
+      background: #131921;
+      color: #fff;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+      padding: 20px;
+    }
+    h1 {
+      font-weight: 900;
+      letter-spacing: 2px;
+      font-size: 3rem;
+      margin-bottom: 0.5rem;
+      color: #ff9900;
+      text-shadow: 1px 1px 3px #6b4e00;
+    }
+    #box {
+      width: 160px;
+      height: 160px;
+      background-image: url('https://upload.wikimedia.org/wikipedia/commons/thumb/a/a9/Amazon_box.svg/320px-Amazon_box.svg.png');
+      background-repeat: no-repeat;
+      background-size: contain;
+      cursor: pointer;
+      transition: transform 0.1s ease;
+      box-shadow: 0 0 20px #ff9900aa;
+      border-radius: 20px;
+      margin: 10px auto;
+    }
+    #box:active {
+      transform: scale(0.9);
+      box-shadow: 0 0 30px #ffbb33;
+    }
+    #revenue {
+      font-size: 1.8rem;
+      font-weight: 700;
+      margin-top: 10px;
+      color: #fff;
+      text-shadow: 0 0 8px #ffbb33;
+    }
+    #upgrades {
+      margin-top: 40px;
+      width: 100%;
+      max-width: 600px;
+      background: #232f3e;
+      border-radius: 15px;
+      box-shadow: 0 0 15px #222;
+      padding: 20px;
+    }
+    #upgrades h2 {
+      color: #ff9900;
+      margin-bottom: 20px;
+      font-weight: 800;
+      text-align: center;
+      text-shadow: 1px 1px 2px #6b4e00;
+    }
+    .upgrade {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: #131921;
+      border-radius: 10px;
+      padding: 15px 20px;
+      margin-bottom: 15px;
+      box-shadow: inset 0 0 5px #000000aa;
+      transition: background 0.3s ease;
+      cursor: pointer;
+    }
+    .upgrade:hover {
+      background: #1a2738;
+    }
+    .upgrade-description {
+      flex: 1;
+      color: #eee;
+      font-size: 1rem;
+      user-select: none;
+    }
+    .upgrade-description strong {
+      font-size: 1.1rem;
+      color: #ffbb33;
+    }
+    .upgrade-stats {
+      text-align: right;
+      min-width: 110px;
+      user-select: none;
+    }
+    button.buy-btn {
+      background: #ff9900;
+      border: none;
+      border-radius: 8px;
+      color: #2b1a00;
+      font-weight: 800;
+      font-size: 1rem;
+      padding: 10px 18px;
+      cursor: pointer;
+      box-shadow: 0 0 12px #ff9900cc;
+      transition: background 0.3s ease;
+      user-select: none;
+      min-width: 100px;
+    }
+    button.buy-btn:hover:not(:disabled) {
+      background: #ffbb33;
+      box-shadow: 0 0 20px #ffbb33cc;
+    }
+    button.buy-btn:disabled {
+      background: #555;
+      cursor: not-allowed;
+      box-shadow: none;
+      color: #bbb;
+    }
+    @media (max-width: 600px) {
+      #box {
+        width: 120px;
+        height: 120px;
+      }
+      #upgrades {
+        padding: 15px;
+      }
+      .upgrade-description {
+        font-size: 0.9rem;
+      }
+      button.buy-btn {
+        font-size: 0.9rem;
+        padding: 8px 12px;
+        min-width: 80px;
+      }
+    }
+  </style>
 </head>
 <body>
+  <h1>Amazon Clicker</h1>
+  <div id="box" title="Click me to earn revenue!"></div>
+  <div id="revenue">Revenue: $0</div>
 
-<h1>Amazon Clicker</h1>
-<div id="box" title="Click me to earn revenue!"></div>
-<div id="revenue">Revenue: $0</div>
+  <div id="upgrades">
+    <h2>Upgrades</h2>
+  </div>
 
-<div id="upgrades">
-  <h2>Upgrades</h2>
-  <!-- Upgrades will go here -->
-</div>
+  <script>
+    // Game state
+    let revenue = 0;
+    let revenuePerClick = 1;
+    let revenuePerSecond = 0;
 
-<script>
-  // Game state
-  let revenue = 0;
-  let revenuePerClick = 1;
-  let revenuePerSecond = 0;
+    const upgrades = [
+      {
+        name: "Warehouse Automation",
+        description: "Automatically generate $2 revenue per second.",
+        cost: 50,
+        revenuePerSecond: 2,
+        revenuePerClickIncrease: 0,
+        count: 0,
+      },
+      {
+        name: "Delivery Drones",
+        description: "Automatically generate $10 revenue per second.",
+        cost: 200,
+        revenuePerSecond: 10,
+        revenuePerClickIncrease: 0,
+        count: 0,
+      },
+      {
+        name: "Prime Membership",
+        description: "Increase revenue per click by 5.",
+        cost: 100,
+        revenuePerSecond: 0,
+        revenuePerClickIncrease: 5,
+        count: 0,
+      },
+      {
+        name: "Amazon Web Services",
+        description: "Generate $50 revenue per second.",
+        cost: 1000,
+        revenuePerSecond: 50,
+        revenuePerClickIncrease: 0,
+        count: 0,
+      },
+    ];
 
-  // Upgrades definitions
-  const upgrades = [
-    {
-      name: "Warehouse Automation",
-      description: "Automatically generate $2 revenue per second.",
-      cost: 50,
-      revenuePerSecond: 2,
-      count: 0
-    },
-    {
-      name: "Delivery Drones",
-      description: "Automatically generate $10 revenue per second.",
-      cost: 200,
-      revenuePerSecond: 10,
-      count: 0
-    },
-    {
-      name: "Prime Membership",
-      description: "Increase revenue per click by 5.",
-      cost: 100,
-      revenuePerClickIncrease: 5,
-      count: 0
-    },
-    {
-      name: "Amazon Web Services",
-      description: "Generate $50 revenue per second.",
-      cost: 1000,
-      revenuePerSecond: 50,
-      count: 0
+    const box = document.getElementById('box');
+    const revenueEl = document.getElementById('revenue');
+    const upgradesEl = document.getElementById('upgrades');
+
+    function formatNumber(num) {
+      return num.toLocaleString(undefined, {maximumFractionDigits: 0});
     }
-  ];
 
-  // Elements
-  const box = document.getElementById('box');
-  const revenueEl = document.getElementById('revenue');
-  const upgradesEl = document.getElementById('upgrades');
+    function updateRevenueDisplay() {
+      revenueEl.textContent = `Revenue: $${formatNumber(revenue)}`;
+    }
 
-  // Update revenue display
-  function updateRevenueDisplay() {
-    revenueEl.textContent = `Revenue: $${Math.floor(revenue).toLocaleString()}`;
-  }
+    // Click box to earn
+    box.addEventListener('click', () => {
+      revenue += revenuePerClick;
+      updateRevenueDisplay();
+      updateButtons();
+      animateBoxClick();
+    });
 
-  // Click handler
-  box.addEventListener('click', () => {
-    revenue += revenuePerClick;
-    updateRevenueDisplay();
-  });
+    // Animate box click (small scale pop)
+    function animateBoxClick() {
+      box.style.transform = 'scale(0.9)';
+      setTimeout(() => {
+        box.style.transform = 'scale(1)';
+      }, 100);
+    }
 
-  // Build upgrade UI
-  upgrades.forEach((upgrade, index) => {
-    const div = document.createElement('div');
-    div.className = 'upgrade';
-    div.title = upgrade.description;
+    // Build upgrade list UI
+    upgrades.forEach((upgrade, i) => {
+      const container = document.createElement('div');
+      container.className = 'upgrade';
+      container.title = upgrade.description;
 
-    const desc = document.createElement('div');
-    desc.className = 'upgrade-description';
-    desc.innerHTML = `<strong>${upgrade.name}</strong><br>${upgrade.description}<br>Owned: <span id="count-${index}">0</span>`;
+      const desc = document.createElement('div');
+      desc.className = 'upgrade-description';
+      desc.innerHTML = `<strong>${upgrade.name}</strong><br>${upgrade.description}<br>Owned: <span id="count-${i}">0</span>`;
 
-    const btn = document.createElement('button');
-    btn.textContent = `Buy ($${upgrade.cost})`;
-    btn.id = `buy-btn-${index}`;
+      const stats = document.createElement('div');
+      stats.className = 'upgrade-stats';
 
-    btn.addEventListener('click', () => {
-      if (revenue >= upgrade.cost) {
-        revenue -= upgrade.cost;
-        upgrade.count++;
-        if (upgrade.revenuePerSecond) {
+      const btn = document.createElement('button');
+      btn.className = 'buy-btn';
+      btn.textContent = `Buy ($${formatNumber(upgrade.cost)})`;
+      btn.id = `buy-btn-${i}`;
+
+      btn.addEventListener('click', () => {
+        if (revenue >= upgrade.cost) {
+          revenue -= upgrade.cost;
+          upgrade.count++;
           revenuePerSecond += upgrade.revenuePerSecond;
-        }
-        if (upgrade.revenuePerClickIncrease) {
           revenuePerClick += upgrade.revenuePerClickIncrease;
+
+          // Exponential cost growth
+          upgrade.cost = Math.floor(upgrade.cost * 1.5);
+
+          btn.textContent = `Buy ($${formatNumber(upgrade.cost)})`;
+          document.getElementById(`count-${i}`).textContent = upgrade.count;
+          updateRevenueDisplay();
+          updateButtons();
         }
-        // Increase cost exponentially
-        upgrade.cost = Math.floor(upgrade.cost * 1.5);
-        btn.textContent = `Buy ($${upgrade.cost})`;
-        document.getElementById(`count-${index}`).textContent = upgrade.count;
-        updateRevenueDisplay();
-        updateButtons();
-      }
+      });
+
+      stats.appendChild(btn);
+      container.appendChild(desc);
+      container.appendChild(stats);
+      upgradesEl.appendChild(container);
     });
 
-    div.appendChild(desc);
-    div.appendChild(btn);
-    upgradesEl.appendChild(div);
-  });
+    function updateButtons() {
+      upgrades.forEach((upgrade, i) => {
+        const btn = document.getElementById(`buy-btn-${i}`);
+        btn.disabled = revenue < upgrade.cost;
+      });
+    }
 
-  // Update buttons disabled state
-  function updateButtons() {
-    upgrades.forEach((upgrade, index) => {
-      const btn = document.getElementById(`buy-btn-${index}`);
-      btn.disabled = revenue < upgrade.cost;
-    });
-  }
+    // Auto revenue generator (per second)
+    setInterval(() => {
+      revenue += revenuePerSecond;
+      updateRevenueDisplay();
+      updateButtons();
+    }, 1000);
 
-  // Auto revenue loop every second
-  setInterval(() => {
-    revenue += revenuePerSecond;
     updateRevenueDisplay();
     updateButtons();
-  }, 1000);
-
-  // Initial display update
-  updateRevenueDisplay();
-  updateButtons();
-</script>
-
+  </script>
 </body>
 </html>
