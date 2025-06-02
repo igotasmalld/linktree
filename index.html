@@ -9,7 +9,7 @@
       margin: 0;
       font-family: Arial, sans-serif;
       overflow: hidden;
-      background: url('https://images.unsplash.com/photo-1598032893785-d91b6be1cf49?auto=format&fit=crop&w=1950&q=80') no-repeat center center fixed;
+      background: url('https://images.unsplash.com/photo-1610426662204-cde47af1f881?auto=format&fit=crop&w=1950&q=80') no-repeat center center fixed;
       background-size: cover;
       color: white;
     }
@@ -56,8 +56,8 @@
 
     .package {
       position: absolute;
-      width: 80px;
-      height: 80px;
+      width: 100px;
+      height: 100px;
       object-fit: contain;
       cursor: pointer;
       transition: transform 0.1s;
@@ -81,24 +81,27 @@
 </head>
 <body>
 
+<!-- Schermata iniziale -->
 <div id="startScreen">
   <h1>📦 Acchiappa il Pacco Amazon!</h1>
   <p>
-    I pacchi stanno spuntando ovunque nel magazzino Amazon!<br>
-    Il tuo obiettivo è cliccarli il più velocemente possibile.<br>
+    I pacchi Prime appaiono in tutto il magazzino!<br>
+    Cliccali prima che spariscano!<br>
     Se ne manchi 5... GAME OVER!<br><br>
     Clicca su "Inizia" per cominciare!
   </p>
   <button onclick="startGame()">Inizia</button>
 </div>
 
+<!-- Area di gioco -->
 <div id="game">
   <div id="scoreboard">Punteggio: 0 | Mancati: 0</div>
 </div>
 
+<!-- Schermata Game Over -->
 <div id="gameOver" style="display: none;">
   <h1>💥 GAME OVER 💥</h1>
-  <p>Hai mancato 5 pacchi! Riprova?</p>
+  <p>Hai mancato 5 pacchi! Riprova a essere il miglior picker!</p>
   <button onclick="startGame()">Rigioca</button>
 </div>
 
@@ -113,8 +116,7 @@
   let packageImg = null;
   let interval = null;
 
-  // ✅ IMMAGINE DEL PACCO - visibile e stabile
-  const packageSrc = "https://cdn-icons-png.flaticon.com/512/104/104113.png";
+  const packageSrc = "https://m.media-amazon.com/images/G/01/sell/images/prime-boxes/prime-boxes-2.png";
 
   function spawnPackage() {
     if (packageImg) {
@@ -152,7 +154,10 @@
   function checkGameOver() {
     if (misses >= 5) {
       clearInterval(interval);
-      if (packageImg) game.removeChild(packageImg);
+      if (packageImg) {
+        game.removeChild(packageImg);
+        packageImg = null;
+      }
       gameOverScreen.style.display = 'flex';
     }
   }
@@ -161,12 +166,16 @@
     score = 0;
     misses = 0;
     updateScore();
+
     if (packageImg) {
       game.removeChild(packageImg);
       packageImg = null;
     }
+
     gameOverScreen.style.display = 'none';
     startScreen.style.display = 'none';
+
+    clearInterval(interval);
     interval = setInterval(spawnPackage, 1000);
   }
 </script>
