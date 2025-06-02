@@ -1,74 +1,152 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Bezos Net Worth Calculator</title>
+  <meta charset="UTF-8">
+  <title>Amazon Package Panic!</title>
   <style>
     body {
-      font-family: Arial, sans-serif;
-      background: #f2f2f2;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      min-height: 100vh;
       margin: 0;
-      padding: 20px;
+      background: #f0f0f0;
+      font-family: sans-serif;
+      overflow: hidden;
     }
-    .container {
-      background: white;
-      padding: 2rem;
-      border-radius: 12px;
-      box-shadow: 0 5px 20px rgba(0,0,0,0.1);
-      max-width: 400px;
+    #game {
+      position: relative;
       width: 100%;
+      height: 100vh;
+      background: linear-gradient(#fff, #ccc);
+      overflow: hidden;
+    }
+    #worker {
+      position: absolute;
+      bottom: 10px;
+      left: 50%;
+      width: 80px;
+      height: 80px;
+      background: orange;
+      border-radius: 20px;
+      transform: translateX(-50%);
       text-align: center;
-    }
-    input {
-      padding: 10px;
-      width: 100%;
-      font-size: 1rem;
-      margin-top: 10px;
-      margin-bottom: 1rem;
-      border: 1px solid #ccc;
-      border-radius: 5px;
-    }
-    .result {
-      font-size: 1.25rem;
       font-weight: bold;
-      margin-top: 1rem;
+      line-height: 80px;
+      color: white;
+      font-size: 20px;
     }
-    .note {
-      font-size: 0.85rem;
-      color: #666;
-      margin-top: 0.5rem;
+    .package {
+      position: absolute;
+      top: 0;
+      width: 40px;
+      height: 40px;
+      background: brown;
+      border-radius: 5px;
+      animation: fall 5s linear;
+      color: white;
+      text-align: center;
+      line-height: 40px;
+      font-size: 12px;
+    }
+    @keyframes fall {
+      0% { top: 0; }
+      100% { top: 100%; }
+    }
+    #scoreboard {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      font-size: 18px;
+    }
+    #message {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 32px;
+      background: yellow;
+      padding: 20px;
+      border: 3px dashed red;
+      display: none;
     }
   </style>
 </head>
 <body>
-  <div class="container">
-    <h1>Vuoi sapere quanti anni devi lavorare per diventare ricco come Jeff Bezos?</h1>
-    <p>Inserisci il tuo <strong>stipendio</strong> mensile:</p>
-    <input type="number" id="income" placeholder="e.g., 3000" />
-    <div class="result" id="result">Anni di lavoro: –</div>
-    <div class="note">Considerando che il patrimonio di Jeff Bezos equivale a 220 miliardi.</div>
+  <div id="game">
+    <div id="worker">📦</div>
+    <div id="scoreboard">Caught: 0 | Missed: 0</div>
+    <div id="message"></div>
   </div>
 
   <script>
-    const bezosNetWorth = 220_000_000_000;
-    const input = document.getElementById("income");
-    const resultDiv = document.getElementById("result");
+    const game = document.getElementById('game');
+    const worker = document.getElementById('worker');
+    const scoreboard = document.getElementById('scoreboard');
+    const message = document.getElementById('message');
 
-    input.addEventListener("input", () => {
-      const monthlyIncome = parseFloat(input.value);
-      if (isNaN(monthlyIncome) || monthlyIncome <= 0) {
-        resultDiv.textContent = "Please enter a valid income.";
-        return;
+    let caught = 0;
+    let missed = 0;
+
+    // Move worker
+    document.addEventListener('keydown', (e) => {
+      let left = parseInt(window.getComputedStyle(worker).left);
+      if (e.key === 'ArrowLeft') {
+        worker.style.left = Math.max(left - 30, 0) + 'px';
+      } else if (e.key === 'ArrowRight') {
+        worker.style.left = Math.min(left + 30, game.clientWidth - 80) + 'px';
       }
-      const years = bezosNetWorth / (monthlyIncome * 12);
-      resultDiv.textContent = `Anni necessari: ${years.toLocaleString(undefined, {maximumFractionDigits: 2})}`;
     });
+
+    // Drop packages
+    function dropPackage() {
+      const pkg = document.createElement('div');
+      pkg.className = 'package';
+      pkg.style.left = Math.random() * (game.clientWidth - 40) + 'px';
+      pkg.textContent = "📦";
+      game.appendChild(pkg);
+
+      const pkgInterval = setInterval(() => {
+        const pkgRect = pkg.getBoundingClientRect();
+        const workerRect = worker.getBoundingClientRect();
+
+        if (pkgRect.bottom >= game.clientHeight - 10) {
+          if (
+            pkgRect.left < workerRect.right &&
+            pkgRect.right > workerRect.left
+          ) {
+            caught++;
+          } else {
+            missed++;
+            funnyAlert(missed);
+          }
+          scoreboard.textContent = `Caught: ${caught} | Missed: ${missed}`;
+          clearInterval(pkgInterval);
+          game.removeChild(pkg);
+          if (missed >= 5) endGame();
+        }
+      }, 50);
+
+      setTimeout(dropPackage, Math.random() * 1500 + 500);
+    }
+
+    // End game
+    function endGame() {
+      message.textContent = "YOU'RE FIRED! 🔥";
+      message.style.display = 'block';
+    }
+
+    // Funny alerts
+    function funnyAlert(count) {
+      const phrases = [
+        "Oops! That one’s going to Ohio!",
+        "Jeff Bezos is watching...",
+        "Package lost. Hope it wasn't a PS5!",
+        "Your manager saw that.",
+        "You dropped grandma’s blender!",
+      ];
+      if (count <= 5) {
+        alert(phrases[count - 1] || "Another one bites the dust!");
+      }
+    }
+
+    dropPackage(); // Start the game
   </script>
 </body>
 </html>
