@@ -1,184 +1,108 @@
 <!DOCTYPE html>
-<html lang="it">
+<html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Acchiappa il Pacco Amazon</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Snake Game</title>
   <style>
-    * { box-sizing: border-box; }
     body {
       margin: 0;
-      font-family: Arial, sans-serif;
-      overflow: hidden;
-      background: url('https://images.unsplash.com/photo-1610426662204-cde47af1f881?auto=format&fit=crop&w=1950&q=80') no-repeat center center fixed;
-      background-size: cover;
+      background: #111;
       color: white;
-    }
-
-    #startScreen, #gameOver {
-      position: absolute;
-      width: 100vw;
-      height: 100vh;
-      background-color: rgba(0, 0, 0, 0.8);
+      font-family: sans-serif;
       display: flex;
       flex-direction: column;
-      justify-content: center;
       align-items: center;
-      z-index: 10;
+      justify-content: center;
+      height: 100vh;
+    }
+
+    canvas {
+      background: #222;
+      border: 2px solid #0f0;
     }
 
     h1 {
-      font-size: 48px;
-      margin-bottom: 20px;
-    }
-
-    p {
-      font-size: 20px;
-      max-width: 600px;
-      text-align: center;
-    }
-
-    button {
-      padding: 10px 20px;
-      font-size: 20px;
-      margin-top: 20px;
-      border: none;
-      border-radius: 8px;
-      background-color: orange;
-      color: black;
-      cursor: pointer;
-    }
-
-    #game {
-      position: relative;
-      width: 100vw;
-      height: 100vh;
-    }
-
-    .package {
-      position: absolute;
-      width: 100px;
-      height: 100px;
-      object-fit: contain;
-      cursor: pointer;
-      transition: transform 0.1s;
-    }
-
-    .package:active {
-      transform: scale(0.9);
-    }
-
-    #scoreboard {
-      position: absolute;
-      top: 10px;
-      left: 10px;
-      background-color: rgba(0, 0, 0, 0.6);
-      padding: 8px 12px;
-      border-radius: 8px;
-      font-size: 20px;
-      z-index: 5;
+      margin: 20px;
     }
   </style>
 </head>
 <body>
+  <h1>Snake Game</h1>
+  <canvas id="game" width="400" height="400"></canvas>
 
-<!-- Schermata iniziale -->
-<div id="startScreen">
-  <h1>📦 Acchiappa il Pacco Amazon!</h1>
-  <p>
-    I pacchi Prime appaiono in tutto il magazzino!<br>
-    Cliccali prima che spariscano!<br>
-    Se ne manchi 5... GAME OVER!<br><br>
-    Clicca su "Inizia" per cominciare!
-  </p>
-  <button onclick="startGame()">Inizia</button>
-</div>
+  <script>
+    const canvas = document.getElementById("game");
+    const ctx = canvas.getContext("2d");
 
-<!-- Area di gioco -->
-<div id="game">
-  <div id="scoreboard">Punteggio: 0 | Mancati: 0</div>
-</div>
+    const gridSize = 20;
+    const tileCount = canvas.width / gridSize;
 
-<!-- Schermata Game Over -->
-<div id="gameOver" style="display: none;">
-  <h1>💥 GAME OVER 💥</h1>
-  <p>Hai mancato 5 pacchi! Riprova a essere il miglior picker!</p>
-  <button onclick="startGame()">Rigioca</button>
-</div>
+    let snake = [{ x: 10, y: 10 }];
+    let velocity = { x: 0, y: 0 };
+    let food = { x: 15, y: 15 };
+    let score = 0;
 
-<script>
-  const game = document.getElementById('game');
-  const scoreboard = document.getElementById('scoreboard');
-  const startScreen = document.getElementById('startScreen');
-  const gameOverScreen = document.getElementById('gameOver');
+    function gameLoop() {
+      // Move snake
+      const head = { x: snake[0].x + velocity.x, y: snake[0].y + velocity.y };
+      snake.unshift(head);
 
-  let score = 0;
-  let misses = 0;
-  let packageImg = null;
-  let interval = null;
+      // Check food collision
+      if (head.x === food.x && head.y === food.y) {
+        food = {
+          x: Math.floor(Math.random() * tileCount),
+          y: Math.floor(Math.random() * tileCount)
+        };
+        score++;
+      } else {
+        snake.pop(); // remove tail
+      }
 
-  const packageSrc = "https://m.media-amazon.com/images/G/01/sell/images/prime-boxes/prime-boxes-2.png";
+      // Check wall or self collision
+      if (
+        head.x < 0 || head.x >= tileCount ||
+        head.y < 0 || head.y >= tileCount ||
+        snake.slice(1).some(segment => segment.x === head.x && segment.y === head.y)
+      ) {
+        alert("Game Over! Your score: " + score);
+        snake = [{ x: 10, y: 10 }];
+        velocity = { x: 0, y: 0 };
+        food = { x: 15, y: 15 };
+        score = 0;
+      }
 
-  function spawnPackage() {
-    if (packageImg) {
-      game.removeChild(packageImg);
-      misses++;
-      updateScore();
-      checkGameOver();
+      // Draw
+      ctx.fillStyle = "#222";
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      ctx.fillStyle = "lime";
+      snake.forEach(segment => {
+        ctx.fillRect(segment.x * gridSize, segment.y * gridSize, gridSize - 2, gridSize - 2);
+      });
+
+      ctx.fillStyle = "red";
+      ctx.fillRect(food.x * gridSize, food.y * gridSize, gridSize - 2, gridSize - 2);
     }
 
-    packageImg = document.createElement('img');
-    packageImg.src = packageSrc;
-    packageImg.classList.add('package');
-
-    const x = Math.random() * (window.innerWidth - 100);
-    const y = Math.random() * (window.innerHeight - 100);
-    packageImg.style.left = `${x}px`;
-    packageImg.style.top = `${y}px`;
-
-    packageImg.addEventListener('click', () => {
-      if (packageImg) {
-        game.removeChild(packageImg);
-        packageImg = null;
-        score++;
-        updateScore();
+    document.addEventListener("keydown", e => {
+      switch (e.key) {
+        case "ArrowUp":
+          if (velocity.y === 0) velocity = { x: 0, y: -1 };
+          break;
+        case "ArrowDown":
+          if (velocity.y === 0) velocity = { x: 0, y: 1 };
+          break;
+        case "ArrowLeft":
+          if (velocity.x === 0) velocity = { x: -1, y: 0 };
+          break;
+        case "ArrowRight":
+          if (velocity.x === 0) velocity = { x: 1, y: 0 };
+          break;
       }
     });
 
-    game.appendChild(packageImg);
-  }
-
-  function updateScore() {
-    scoreboard.textContent = `Punteggio: ${score} | Mancati: ${misses}`;
-  }
-
-  function checkGameOver() {
-    if (misses >= 5) {
-      clearInterval(interval);
-      if (packageImg) {
-        game.removeChild(packageImg);
-        packageImg = null;
-      }
-      gameOverScreen.style.display = 'flex';
-    }
-  }
-
-  function startGame() {
-    score = 0;
-    misses = 0;
-    updateScore();
-
-    if (packageImg) {
-      game.removeChild(packageImg);
-      packageImg = null;
-    }
-
-    gameOverScreen.style.display = 'none';
-    startScreen.style.display = 'none';
-
-    clearInterval(interval);
-    interval = setInterval(spawnPackage, 1000);
-  }
-</script>
-
+    setInterval(gameLoop, 100);
+  </script>
 </body>
 </html>
