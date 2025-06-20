@@ -1,119 +1,131 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>Mouse Snake Game</title>
+  <meta charset="UTF-8">
+  <title>Forklift Frenzy</title>
   <style>
     body {
+      font-family: Arial, sans-serif;
+      background: #eee;
+      text-align: center;
       margin: 0;
-      background: #111;
-      color: white;
-      font-family: sans-serif;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      height: 100vh;
+      overflow: hidden;
     }
 
-    canvas {
-      background: #222;
-      border: 2px solid #0f0;
-      cursor: crosshair;
+    #gameArea {
+      position: relative;
+      width: 800px;
+      height: 600px;
+      background-color: #d4cfcf;
+      border: 5px solid #444;
+      margin: 20px auto;
+      overflow: hidden;
     }
 
-    h1 {
-      margin: 20px;
+    .forklift, .package, .supervisor {
+      position: absolute;
+      width: 50px;
+      height: 50px;
+    }
+
+    .forklift {
+      background: url('https://emoji.slack-edge.com/T02EQ73F6/forklift/9748aabed1c9f9b2.png') no-repeat center/cover;
+    }
+
+    .package {
+      background-color: gold;
+      border: 2px dashed brown;
+    }
+
+    .supervisor {
+      background-color: red;
+      border-radius: 50%;
+    }
+
+    #scoreBoard {
+      font-size: 20px;
+      margin-top: 10px;
     }
   </style>
 </head>
 <body>
-  <h1>Snake Game - Mouse Control</h1>
-  <canvas id="game" width="400" height="400"></canvas>
+
+  <h1>🚧 Forklift Frenzy 🚧</h1>
+  <div id="scoreBoard">Score: 0</div>
+  <div id="gameArea">
+    <div id="forklift" class="forklift" style="left: 100px; top: 100px;"></div>
+    <div id="package" class="package" style="left: 400px; top: 300px;"></div>
+    <div id="supervisor" class="supervisor" style="left: 600px; top: 200px;"></div>
+  </div>
 
   <script>
-    const canvas = document.getElementById("game");
-    const ctx = canvas.getContext("2d");
+    const forklift = document.getElementById("forklift");
+    const packageItem = document.getElementById("package");
+    const supervisor = document.getElementById("supervisor");
+    const scoreBoard = document.getElementById("scoreBoard");
 
-    const gridSize = 20;
-    const tileCount = canvas.width / gridSize;
-
-    let snake = [{ x: 10, y: 10 }];
-    let food = { x: 15, y: 15 };
-    let mousePos = { x: 10, y: 10 };
-    let alive = true;
     let score = 0;
+    const step = 20;
 
-    canvas.addEventListener("mousemove", e => {
-      const rect = canvas.getBoundingClientRect();
-      const mx = e.clientX - rect.left;
-      const my = e.clientY - rect.top;
-      mousePos.x = Math.floor(mx / gridSize);
-      mousePos.y = Math.floor(my / gridSize);
+    const gameArea = document.getElementById("gameArea");
+    const areaWidth = gameArea.offsetWidth;
+    const areaHeight = gameArea.offsetHeight;
+
+    document.addEventListener("keydown", (e) => {
+      let left = parseInt(forklift.style.left);
+      let top = parseInt(forklift.style.top);
+
+      if (e.key === "ArrowUp" && top > 0) forklift.style.top = top - step + "px";
+      if (e.key === "ArrowDown" && top < areaHeight - 50) forklift.style.top = top + step + "px";
+      if (e.key === "ArrowLeft" && left > 0) forklift.style.left = left - step + "px";
+      if (e.key === "ArrowRight" && left < areaWidth - 50) forklift.style.left = left + step + "px";
+
+      checkCollision();
     });
 
-    canvas.addEventListener("click", () => {
-      if (!alive) {
-        // Reset
-        snake = [{ x: 10, y: 10 }];
-        food = { x: 15, y: 15 };
-        alive = true;
-        score = 0;
-      }
-    });
-
-    function gameLoop() {
-      if (!alive) return;
-
-      // Get head and move toward mouse
-      const head = { ...snake[0] };
-      const dx = mousePos.x - head.x;
-      const dy = mousePos.y - head.y;
-
-      if (Math.abs(dx) > Math.abs(dy)) {
-        head.x += dx > 0 ? 1 : dx < 0 ? -1 : 0;
-      } else {
-        head.y += dy > 0 ? 1 : dy < 0 ? -1 : 0;
-      }
-
-      snake.unshift(head);
-
-      // Check food
-      if (head.x === food.x && head.y === food.y) {
-        food = {
-          x: Math.floor(Math.random() * tileCount),
-          y: Math.floor(Math.random() * tileCount)
-        };
-        score++;
-      } else {
-        snake.pop();
-      }
-
-      // Collision
-      if (
-        head.x < 0 || head.x >= tileCount ||
-        head.y < 0 || head.y >= tileCount ||
-        snake.slice(1).some(s => s.x === head.x && s.y === head.y)
-      ) {
-        alive = false;
-        alert("Game Over! Score: " + score + "\nClick the canvas to restart.");
-        return;
-      }
-
-      // Draw
-      ctx.fillStyle = "#222";
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-      ctx.fillStyle = "lime";
-      snake.forEach(s => {
-        ctx.fillRect(s.x * gridSize, s.y * gridSize, gridSize - 2, gridSize - 2);
-      });
-
-      ctx.fillStyle = "red";
-      ctx.fillRect(food.x * gridSize, food.y * gridSize, gridSize - 2, gridSize - 2);
+    function randomPosition() {
+      return {
+        x: Math.floor(Math.random() * (areaWidth - 50)),
+        y: Math.floor(Math.random() * (areaHeight - 50)),
+      };
     }
 
-    setInterval(gameLoop, 100);
+    function checkCollision() {
+      const forkliftRect = forklift.getBoundingClientRect();
+      const packageRect = packageItem.getBoundingClientRect();
+      const supervisorRect = supervisor.getBoundingClientRect();
+
+      if (isOverlap(forkliftRect, packageRect)) {
+        score++;
+        scoreBoard.innerText = "Score: " + score;
+        const pos = randomPosition();
+        packageItem.style.left = pos.x + "px";
+        packageItem.style.top = pos.y + "px";
+      }
+
+      if (isOverlap(forkliftRect, supervisorRect)) {
+        alert("👷 Busted by Supervisor! Back to training!");
+        location.reload();
+      }
+    }
+
+    function isOverlap(rect1, rect2) {
+      return !(
+        rect1.right < rect2.left ||
+        rect1.left > rect2.right ||
+        rect1.bottom < rect2.top ||
+        rect1.top > rect2.bottom
+      );
+    }
+
+    function moveSupervisorRandomly() {
+      const pos = randomPosition();
+      supervisor.style.left = pos.x + "px";
+      supervisor.style.top = pos.y + "px";
+    }
+
+    setInterval(moveSupervisorRandomly, 1000);
   </script>
+
 </body>
 </html>
