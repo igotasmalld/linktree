@@ -1,131 +1,111 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Forklift Frenzy</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Warehouse Scanner Madness</title>
   <style>
     body {
-      font-family: Arial, sans-serif;
-      background: #eee;
-      text-align: center;
       margin: 0;
+      padding: 0;
+      font-family: "Comic Sans MS", cursive, sans-serif;
+      background: #f4f4f4;
       overflow: hidden;
+      text-align: center;
     }
-
-    #gameArea {
-      position: relative;
-      width: 800px;
-      height: 600px;
-      background-color: #d4cfcf;
-      border: 5px solid #444;
-      margin: 20px auto;
-      overflow: hidden;
+    h1 {
+      background-color: #333;
+      color: #fff;
+      padding: 20px;
+      margin: 0;
     }
-
-    .forklift, .package, .supervisor {
+    #scoreboard {
+      margin: 10px;
+      font-size: 24px;
+    }
+    .box {
       position: absolute;
-      width: 50px;
-      height: 50px;
+      width: 80px;
+      height: 80px;
+      background-color: brown;
+      border: 2px solid black;
+      border-radius: 10px;
+      cursor: pointer;
+      background-image: url('https://i.imgur.com/WvRbv4s.png'); /* A cartoon box image */
+      background-size: cover;
     }
-
-    .forklift {
-      background: url('https://emoji.slack-edge.com/T02EQ73F6/forklift/9748aabed1c9f9b2.png') no-repeat center/cover;
-    }
-
-    .package {
-      background-color: gold;
-      border: 2px dashed brown;
-    }
-
-    .supervisor {
-      background-color: red;
-      border-radius: 50%;
-    }
-
-    #scoreBoard {
+    #startBtn {
+      padding: 10px 20px;
       font-size: 20px;
-      margin-top: 10px;
+      cursor: pointer;
+      background: #28a745;
+      color: white;
+      border: none;
+      border-radius: 5px;
     }
   </style>
 </head>
 <body>
-
-  <h1>🚧 Forklift Frenzy 🚧</h1>
-  <div id="scoreBoard">Score: 0</div>
-  <div id="gameArea">
-    <div id="forklift" class="forklift" style="left: 100px; top: 100px;"></div>
-    <div id="package" class="package" style="left: 400px; top: 300px;"></div>
-    <div id="supervisor" class="supervisor" style="left: 600px; top: 200px;"></div>
-  </div>
+  <h1>📦 Warehouse Scanner Madness</h1>
+  <div id="scoreboard">Score: 0 | Time: 30</div>
+  <button id="startBtn">Start Scanning!</button>
 
   <script>
-    const forklift = document.getElementById("forklift");
-    const packageItem = document.getElementById("package");
-    const supervisor = document.getElementById("supervisor");
-    const scoreBoard = document.getElementById("scoreBoard");
-
+    const startBtn = document.getElementById('startBtn');
+    const scoreboard = document.getElementById('scoreboard');
     let score = 0;
-    const step = 20;
-
-    const gameArea = document.getElementById("gameArea");
-    const areaWidth = gameArea.offsetWidth;
-    const areaHeight = gameArea.offsetHeight;
-
-    document.addEventListener("keydown", (e) => {
-      let left = parseInt(forklift.style.left);
-      let top = parseInt(forklift.style.top);
-
-      if (e.key === "ArrowUp" && top > 0) forklift.style.top = top - step + "px";
-      if (e.key === "ArrowDown" && top < areaHeight - 50) forklift.style.top = top + step + "px";
-      if (e.key === "ArrowLeft" && left > 0) forklift.style.left = left - step + "px";
-      if (e.key === "ArrowRight" && left < areaWidth - 50) forklift.style.left = left + step + "px";
-
-      checkCollision();
-    });
+    let timeLeft = 30;
+    let gameInterval;
 
     function randomPosition() {
-      return {
-        x: Math.floor(Math.random() * (areaWidth - 50)),
-        y: Math.floor(Math.random() * (areaHeight - 50)),
-      };
+      const x = Math.floor(Math.random() * (window.innerWidth - 100));
+      const y = Math.floor(Math.random() * (window.innerHeight - 150)) + 50;
+      return { x, y };
     }
 
-    function checkCollision() {
-      const forkliftRect = forklift.getBoundingClientRect();
-      const packageRect = packageItem.getBoundingClientRect();
-      const supervisorRect = supervisor.getBoundingClientRect();
-
-      if (isOverlap(forkliftRect, packageRect)) {
-        score++;
-        scoreBoard.innerText = "Score: " + score;
-        const pos = randomPosition();
-        packageItem.style.left = pos.x + "px";
-        packageItem.style.top = pos.y + "px";
-      }
-
-      if (isOverlap(forkliftRect, supervisorRect)) {
-        alert("👷 Busted by Supervisor! Back to training!");
-        location.reload();
-      }
-    }
-
-    function isOverlap(rect1, rect2) {
-      return !(
-        rect1.right < rect2.left ||
-        rect1.left > rect2.right ||
-        rect1.bottom < rect2.top ||
-        rect1.top > rect2.bottom
-      );
-    }
-
-    function moveSupervisorRandomly() {
+    function spawnBox() {
+      const box = document.createElement('div');
+      box.classList.add('box');
       const pos = randomPosition();
-      supervisor.style.left = pos.x + "px";
-      supervisor.style.top = pos.y + "px";
+      box.style.left = `${pos.x}px`;
+      box.style.top = `${pos.y}px`;
+      document.body.appendChild(box);
+
+      const removeTimeout = setTimeout(() => {
+        if (box.parentElement) box.remove();
+      }, 1500);
+
+      box.addEventListener('click', () => {
+        score++;
+        scoreboard.textContent = `Score: ${score} | Time: ${timeLeft}`;
+        box.remove();
+        clearTimeout(removeTimeout);
+      });
     }
 
-    setInterval(moveSupervisorRandomly, 1000);
-  </script>
+    function startGame() {
+      score = 0;
+      timeLeft = 30;
+      scoreboard.textContent = `Score: ${score} | Time: ${timeLeft}`;
+      startBtn.disabled = true;
 
+      gameInterval = setInterval(() => {
+        spawnBox();
+      }, 500);
+
+      const timerInterval = setInterval(() => {
+        timeLeft--;
+        scoreboard.textContent = `Score: ${score} | Time: ${timeLeft}`;
+        if (timeLeft <= 0) {
+          clearInterval(gameInterval);
+          clearInterval(timerInterval);
+          alert(`⏰ Time's up! You scanned ${score} boxes!`);
+          startBtn.disabled = false;
+        }
+      }, 1000);
+    }
+
+    startBtn.addEventListener('click', startGame);
+  </script>
 </body>
 </html>
