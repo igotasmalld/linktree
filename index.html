@@ -1,161 +1,33 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Multi-User Chat</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Jeff Bezos Photo</title>
   <style>
     body {
-      margin: 0;
-      font-family: 'Segoe UI', sans-serif;
       display: flex;
       flex-direction: column;
-      height: 100vh;
-      background: #f4f4f4;
-    }
-
-    header {
-      background-color: #4f46e5;
-      color: white;
-      padding: 1rem;
-      text-align: center;
-      font-size: 1.5rem;
-    }
-
-    #chat-container {
-      flex: 1;
-      overflow-y: auto;
-      padding: 1rem;
-      display: flex;
-      flex-direction: column;
-      gap: 1rem;
-      background: #fff;
-    }
-
-    .message {
-      max-width: 70%;
-      padding: 0.75rem 1rem;
-      border-radius: 10px;
-      line-height: 1.4;
-      animation: fadeIn 0.3s ease-in;
-    }
-
-    .user {
-      background-color: #4f46e5;
-      color: white;
-      align-self: flex-end;
-    }
-
-    .other {
-      background-color: #e5e7eb;
-      color: #111;
-      align-self: flex-start;
-    }
-
-    .name-tag {
-      font-weight: bold;
-      display: block;
-      margin-bottom: 0.25rem;
-    }
-
-    form {
-      display: flex;
-      padding: 1rem;
-      background: #f3f4f6;
-      gap: 0.5rem;
-    }
-
-    input, button {
-      font-size: 1rem;
-      padding: 0.5rem;
-    }
-
-    #message {
-      flex: 1;
-      border: 1px solid #ccc;
-      border-radius: 10px;
-    }
-
-    #namePrompt {
-      position: fixed;
-      inset: 0;
-      background: rgba(0, 0, 0, 0.6);
-      display: flex;
-      justify-content: center;
       align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f4;
     }
-
-    #namePromptBox {
-      background: white;
-      padding: 2rem;
+    img {
+      max-width: 90%;
+      height: auto;
       border-radius: 12px;
-      box-shadow: 0 0 20px rgba(0,0,0,0.3);
-      text-align: center;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
     }
-
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(10px); }
-      to { opacity: 1; transform: translateY(0); }
+    h1 {
+      margin-bottom: 20px;
     }
   </style>
 </head>
 <body>
-  <div id="namePrompt">
-    <div id="namePromptBox">
-      <h2>Enter Your Name</h2>
-      <input type="text" id="username" placeholder="Your name" />
-      <br><br>
-      <button onclick="enterChat()">Join Chat</button>
-    </div>
-  </div>
-
-  <header>💬 Group Chat</header>
-  <div id="chat-container"></div>
-
-  <form id="chat-form">
-    <input type="text" id="message" placeholder="Type a message..." autocomplete="off" required />
-    <button type="submit">Send</button>
-  </form>
-
-  <script>
-    let name = "";
-    const chatContainer = document.getElementById('chat-container');
-    const form = document.getElementById('chat-form');
-    const input = document.getElementById('message');
-
-    function enterChat() {
-      const nameInput = document.getElementById('username');
-      const enteredName = nameInput.value.trim();
-      if (!enteredName) return alert("Please enter a name.");
-      name = enteredName;
-      document.getElementById('namePrompt').style.display = 'none';
-    }
-
-    function appendMessage(sender, text, isSelf) {
-      const msgDiv = document.createElement('div');
-      msgDiv.className = `message ${isSelf ? 'user' : 'other'}`;
-      msgDiv.innerHTML = `<span class="name-tag">${sender}</span>${text}`;
-      chatContainer.appendChild(msgDiv);
-      chatContainer.scrollTop = chatContainer.scrollHeight;
-    }
-
-    form.addEventListener('submit', e => {
-      e.preventDefault();
-      const text = input.value.trim();
-      if (!text) return;
-      appendMessage(name, text, true);
-
-      // Simulate other user reply
-      setTimeout(() => {
-        const fakeUsers = ["Alex", "Jordan", "Taylor"];
-        const randomUser = fakeUsers[Math.floor(Math.random() * fakeUsers.length)];
-        const replies = ["Interesting!", "Tell me more.", "I agree!", "😂", "👍"];
-        const randomReply = replies[Math.floor(Math.random() * replies.length)];
-        appendMessage(randomUser, randomReply, false);
-      }, 1000);
-
-      input.value = '';
-    });
-  </script>
+  <h1>Jeff Bezos</h1>
+  <img src="https://upload.wikimedia.org/wikipedia/commons/4/4f/Jeff_Bezos%27s_iconic_laugh.jpg" alt="Jeff Bezos">
 </body>
 </html>
