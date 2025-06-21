@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Random Website Redirect</title>
+  <title>Open 10 Websites</title>
   <style>
     body {
       display: flex;
@@ -11,8 +11,8 @@
       align-items: center;
       height: 100vh;
       margin: 0;
-      font-family: sans-serif;
-      background: #f0f0f0;
+      background-color: #f7f7f7;
+      font-family: Arial, sans-serif;
     }
 
     button {
@@ -20,38 +20,38 @@
       font-size: 1.2em;
       border: none;
       border-radius: 10px;
-      background-color: #007bff;
+      background-color: #28a745;
       color: white;
       cursor: pointer;
       transition: background-color 0.3s ease;
     }
 
     button:hover {
-      background-color: #0056b3;
+      background-color: #218838;
     }
   </style>
 </head>
 <body>
-  <button onclick="goToRandomWebsite()">Take Me Somewhere!</button>
+  <button onclick="openWebsites()">Open 10 Websites</button>
 
   <script>
-    const websites = [
-      "https://www.wikipedia.org/",
-      "https://www.reddit.com/",
-      "https://www.boredpanda.com/",
-      "https://www.howstuffworks.com/",
-      "https://www.thisiscolossal.com/",
-      "https://www.explodingtopics.com/",
-      "https://www.gutenberg.org/",
-      "https://radio.garden/",
-      "https://www.window-swap.com/",
-      "https://www.futureme.org/"
-    ];
+    function openWebsites() {
+      const websites = [
+        "https://www.wikipedia.org/",
+        "https://www.reddit.com/",
+        "https://www.boredpanda.com/",
+        "https://www.howstuffworks.com/",
+        "https://www.thisiscolossal.com/",
+        "https://www.explodingtopics.com/",
+        "https://www.gutenberg.org/",
+        "https://radio.garden/",
+        "https://www.window-swap.com/",
+        "https://www.futureme.org/"
+      ];
 
-    function goToRandomWebsite() {
-      const randomIndex = Math.floor(Math.random() * websites.length);
-      const randomSite = websites[randomIndex];
-      window.location.href = randomSite;
+      websites.forEach(url => {
+        window.open(url, '_blank');
+      });
     }
   </script>
 </body>
