@@ -3,111 +3,120 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Warehouse Scanner Madness</title>
+  <title>Whistleblower Portal</title>
   <style>
     body {
-      margin: 0;
-      padding: 0;
-      font-family: "Comic Sans MS", cursive, sans-serif;
-      background: #f4f4f4;
-      overflow: hidden;
-      text-align: center;
-    }
-    h1 {
-      background-color: #333;
-      color: #fff;
+      font-family: Arial, sans-serif;
+      background-color: #121212;
+      color: #f0f0f0;
       padding: 20px;
-      margin: 0;
     }
-    #scoreboard {
-      margin: 10px;
-      font-size: 24px;
-    }
- .box {
-  position: absolute;
-  width: 80px;
-  height: 80px;
-  background-color: brown;
-  border: 2px solid black;
-  border-radius: 10px;
-  cursor: pointer;
-  background-image: url('https://upload.wikimedia.org/wikipedia/commons/thumb/4/45/Cardboard_box.svg/120px-Cardboard_box.svg.png');
-  background-size: cover;
-  background-position: center;
-}
 
-    #startBtn {
-      padding: 10px 20px;
-      font-size: 20px;
-      cursor: pointer;
-      background: #28a745;
-      color: white;
+    .container {
+      max-width: 600px;
+      margin: auto;
+      background: #1e1e1e;
+      padding: 30px;
+      border-radius: 8px;
+      box-shadow: 0 0 10px #000;
+    }
+
+    h1 {
+      font-size: 24px;
+      margin-bottom: 10px;
+    }
+
+    label {
+      display: block;
+      margin-top: 15px;
+      font-weight: bold;
+    }
+
+    select, textarea, button {
+      width: 100%;
+      margin-top: 5px;
+      padding: 10px;
+      border-radius: 4px;
       border: none;
-      border-radius: 5px;
+      font-size: 14px;
+    }
+
+    textarea {
+      height: 150px;
+      resize: vertical;
+    }
+
+    button {
+      background-color: #28a745;
+      color: white;
+      margin-top: 20px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #218838;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    #response {
+      margin-top: 20px;
+      padding: 15px;
+      background-color: #2a2a2a;
+      border-left: 5px solid #28a745;
     }
   </style>
 </head>
 <body>
-  <h1>📦 Warehouse Scanner Madness</h1>
-  <div id="scoreboard">Score: 0 | Time: 30</div>
-  <button id="startBtn">Start Scanning!</button>
+  <div class="container">
+    <h1>Anonymous Whistleblower Submission</h1>
+    <p>Your identity will not be recorded. Submit securely.</p>
+
+    <form id="whistleForm">
+      <label for="category">Category:</label>
+      <select id="category" required>
+        <option value="">--Select--</option>
+        <option value="corruption">Corruption</option>
+        <option value="abuse">Abuse</option>
+        <option value="fraud">Fraud</option>
+        <option value="other">Other</option>
+      </select>
+
+      <label for="message">Message:</label>
+      <textarea id="message" placeholder="Describe the issue in detail..." required></textarea>
+
+      <button type="submit">Submit Anonymously</button>
+    </form>
+
+    <div id="response" class="hidden"></div>
+  </div>
 
   <script>
-    const startBtn = document.getElementById('startBtn');
-    const scoreboard = document.getElementById('scoreboard');
-    let score = 0;
-    let timeLeft = 30;
-    let gameInterval;
+    document.getElementById('whistleForm').addEventListener('submit', function (e) {
+      e.preventDefault();
 
-    function randomPosition() {
-      const x = Math.floor(Math.random() * (window.innerWidth - 100));
-      const y = Math.floor(Math.random() * (window.innerHeight - 150)) + 50;
-      return { x, y };
-    }
+      const category = document.getElementById('category').value;
+      const message = document.getElementById('message').value;
 
-    function spawnBox() {
-      const box = document.createElement('div');
-      box.classList.add('box');
-      const pos = randomPosition();
-      box.style.left = `${pos.x}px`;
-      box.style.top = `${pos.y}px`;
-      document.body.appendChild(box);
+      if (!category || !message) {
+        alert('Please fill in all fields.');
+        return;
+      }
 
-      const removeTimeout = setTimeout(() => {
-        if (box.parentElement) box.remove();
-      }, 1500);
+      // Simulate anonymous submission (would be sent to a secure server in real app)
+      console.log('Anonymous submission:', { category, message });
 
-      box.addEventListener('click', () => {
-        score++;
-        scoreboard.textContent = `Score: ${score} | Time: ${timeLeft}`;
-        box.remove();
-        clearTimeout(removeTimeout);
-      });
-    }
+      document.getElementById('whistleForm').reset();
 
-    function startGame() {
-      score = 0;
-      timeLeft = 30;
-      scoreboard.textContent = `Score: ${score} | Time: ${timeLeft}`;
-      startBtn.disabled = true;
-
-      gameInterval = setInterval(() => {
-        spawnBox();
-      }, 500);
-
-      const timerInterval = setInterval(() => {
-        timeLeft--;
-        scoreboard.textContent = `Score: ${score} | Time: ${timeLeft}`;
-        if (timeLeft <= 0) {
-          clearInterval(gameInterval);
-          clearInterval(timerInterval);
-          alert(`⏰ Time's up! You scanned ${score} boxes!`);
-          startBtn.disabled = false;
-        }
-      }, 1000);
-    }
-
-    startBtn.addEventListener('click', startGame);
+      const responseBox = document.getElementById('response');
+      responseBox.classList.remove('hidden');
+      responseBox.innerHTML = `
+        <strong>Thank you for your submission.</strong><br/>
+        Your report has been recorded anonymously.
+      `;
+    });
   </script>
 </body>
 </html>
