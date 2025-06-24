@@ -47,6 +47,23 @@
       color: #444;
     }
 
+    .read-original {
+      display: inline-block;
+      margin-top: 0.75rem;
+      padding: 0.5rem 1rem;
+      border: 1px solid #000;
+      background-color: transparent;
+      color: #000;
+      text-decoration: none;
+      font-size: 0.9rem;
+      transition: background-color 0.2s, color 0.2s;
+    }
+
+    .read-original:hover {
+      background-color: #000;
+      color: #fff;
+    }
+
     footer {
       text-align: center;
       font-size: 0.9rem;
@@ -62,13 +79,15 @@
     <article>
       <h2>Example Headline</h2>
       <time datetime="2025-06-24">June 24, 2025</time>
-      <p>This is a short summary or excerpt from the news article you found. You can also link to the full original article.</p>
+      <p>This is a short summary or excerpt from the news article you found.</p>
+      <a class="read-original" href="https://example.com/original-news" target="_blank">Read Original</a>
     </article>
 
     <article>
       <h2>Another News Title</h2>
       <time datetime="2025-06-23">June 23, 2025</time>
       <p>Reposted content goes here. Stay neutral, summarize clearly, and always credit the original source.</p>
+      <a class="read-original" href="https://example.com/another-news" target="_blank">Read Original</a>
     </article>
   </div>
 
