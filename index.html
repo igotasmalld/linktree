@@ -2,90 +2,99 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Package Scanner</title>
+  <title>Smart Package Scanner</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
     body {
       font-family: sans-serif;
       text-align: center;
-      transition: background 0.3s ease;
+      transition: background-color 0.3s ease;
       background-color: white;
       padding: 2em;
     }
-    input {
-      font-size: 1.5em;
-      padding: 0.5em;
-      margin: 1em;
-      width: 80%;
-      max-width: 400px;
+
+    h1 {
+      font-size: 2rem;
+      margin-bottom: 1rem;
     }
+
+    input {
+      font-size: 1.2rem;
+      padding: 0.8em;
+      margin: 0.5em auto;
+      width: 100%;
+      max-width: 400px;
+      box-sizing: border-box;
+      border: 2px solid #ccc;
+      border-radius: 8px;
+    }
+
     #status {
-      font-size: 2em;
-      margin-top: 2em;
+      font-size: 1.5rem;
+      margin-top: 1.5em;
     }
   </style>
 </head>
 <body>
   <h1>Package Scanner</h1>
 
-  <label>
-    Set Target Code:<br>
-    <input id="target" type="text" placeholder="Enter target code">
-  </label><br>
-
-  <label>
-    Scan Package:<br>
-    <input id="scanner" type="text" placeholder="Scan package" autofocus>
-  </label>
+  <input id="target" type="text" placeholder="Enter target code (e.g. IT1234567890)">
+  <input id="scanner" type="text" placeholder="Scan package" autofocus>
 
   <div id="status">Awaiting scan...</div>
 
-  <audio id="success" src="https://actions.google.com/sounds/v1/alarms/beep_short.ogg" preload="auto"></audio>
-  <audio id="fail" src="https://actions.google.com/sounds/v1/cartoon/cartoon_boing.ogg" preload="auto"></audio>
+  <audio id="successSound" src="https://actions.google.com/sounds/v1/alarms/beep_short.ogg" preload="auto"></audio>
+  <audio id="failSound" src="https://actions.google.com/sounds/v1/cartoon/cartoon_boing.ogg" preload="auto"></audio>
+  <audio id="invalidSound" src="https://actions.google.com/sounds/v1/alarms/buzz.ogg" preload="auto"></audio>
 
   <script>
     const targetInput = document.getElementById('target');
     const scannerInput = document.getElementById('scanner');
     const statusDiv = document.getElementById('status');
-    const successSound = document.getElementById('success');
-    const failSound = document.getElementById('fail');
+    const successSound = document.getElementById('successSound');
+    const failSound = document.getElementById('failSound');
+    const invalidSound = document.getElementById('invalidSound');
 
     let scanTimer = null;
+
+    function isValidCode(code) {
+      return /^IT\d{10}$/.test(code);
+    }
 
     function checkCode() {
       const target = targetInput.value.trim();
       const scanned = scannerInput.value.trim();
 
-      if (!target) {
-        statusDiv.textContent = '⚠️ Set a target code first.';
-        document.body.style.background = 'white';
-        return;
-      }
+      if (!scanned) return;
 
-      if (scanned === target) {
-        document.body.style.background = 'lightgreen';
+      if (!isValidCode(scanned)) {
+        document.body.style.backgroundColor = 'gold';
+        statusDiv.textContent = '⚠️ Invalid Code Format';
+        invalidSound.play();
+      } else if (scanned === target) {
+        document.body.style.backgroundColor = 'lightgreen';
         statusDiv.textContent = '✅ Match!';
         successSound.play();
       } else {
-        document.body.style.background = 'lightcoral';
-        statusDiv.textContent = '❌ No match';
+        document.body.style.backgroundColor = 'lightcoral';
+        statusDiv.textContent = '❌ Code does not match';
         failSound.play();
       }
 
       scannerInput.value = '';
       setTimeout(() => {
-        document.body.style.background = 'white';
+        document.body.style.backgroundColor = 'white';
         statusDiv.textContent = 'Awaiting scan...';
         scannerInput.focus();
-      }, 1000);
+      }, 1500);
     }
 
     scannerInput.addEventListener('input', () => {
-      // Reset and start a new 500ms timer every time input changes
       if (scanTimer) clearTimeout(scanTimer);
       scanTimer = setTimeout(checkCode, 500);
     });
 
-    // Autofocus on page load
+    // Autofocus on load
     window.onload = () => {
       scannerInput.focus();
     };
