@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Package Scanner Checker</title>
+  <title>Smart Package Scanner</title>
   <style>
     body {
       font-family: sans-serif;
@@ -26,6 +26,7 @@
 </head>
 <body>
   <h1>Package Scanner</h1>
+
   <label>
     Set Target Code:<br>
     <input id="target" type="text" placeholder="Enter target code">
@@ -38,20 +39,23 @@
 
   <div id="status">Awaiting scan...</div>
 
-  <audio id="beep" src="https://actions.google.com/sounds/v1/cartoon/clang_and_wobble.ogg" preload="auto"></audio>
+  <!-- New Sound -->
+  <audio id="success" src="https://actions.google.com/sounds/v1/alarms/beep_short.ogg" preload="auto"></audio>
+  <audio id="fail" src="https://actions.google.com/sounds/v1/cartoon/cartoon_boing.ogg" preload="auto"></audio>
 
   <script>
     const targetInput = document.getElementById('target');
     const scannerInput = document.getElementById('scanner');
     const statusDiv = document.getElementById('status');
-    const beepSound = document.getElementById('beep');
+    const successSound = document.getElementById('success');
+    const failSound = document.getElementById('fail');
 
     function checkCode() {
       const target = targetInput.value.trim();
       const scanned = scannerInput.value.trim();
 
       if (!target) {
-        statusDiv.textContent = 'Set a target code first.';
+        statusDiv.textContent = '⚠️ Set a target code first.';
         document.body.style.background = 'white';
         return;
       }
@@ -59,22 +63,39 @@
       if (scanned === target) {
         document.body.style.background = 'lightgreen';
         statusDiv.textContent = '✅ Match!';
-        beepSound.play();
+        successSound.play();
       } else {
         document.body.style.background = 'lightcoral';
         statusDiv.textContent = '❌ No match';
+        failSound.play();
       }
 
       scannerInput.value = '';
-      scannerInput.focus();
+      setTimeout(() => {
+        document.body.style.background = 'white';
+        statusDiv.textContent = 'Awaiting scan...';
+        scannerInput.focus();
+      }, 1000);
     }
 
-    scannerInput.addEventListener('change', checkCode);
+    scannerInput.addEventListener('input', () => {
+      // Many scanner apps auto-press enter after scan
+      if (scannerInput.value.endsWith('\n')) {
+        scannerInput.value = scannerInput.value.trim();
+        checkCode();
+      }
+    });
+
     scannerInput.addEventListener('keypress', (e) => {
       if (e.key === 'Enter') {
         checkCode();
       }
     });
+
+    // Autofocus on load
+    window.onload = () => {
+      scannerInput.focus();
+    };
   </script>
 </body>
 </html>
