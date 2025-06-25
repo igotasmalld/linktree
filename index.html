@@ -1,26 +1,178 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="it">
 <head>
-  <meta charset="UTF-8">
-  <title>DLO1.COM</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Generatore di Cattivi Consigli</title>
   <style>
     body {
-      background-color: black;
-      color: white;
-      font-family: monospace;
+      font-family: 'Comic Sans MS', cursive, sans-serif;
+      background: #ffcccb;
+      color: #800000;
       display: flex;
-      justify-content: center;
+      flex-direction: column;
       align-items: center;
+      justify-content: center;
       height: 100vh;
-      font-size: 1.5em;
+      margin: 0;
+      padding: 20px;
       text-align: center;
-      white-space: pre;
+    }
+    h1 {
+      margin-bottom: 20px;
+      text-shadow: 2px 2px 0 #fff;
+    }
+    #advice {
+      font-size: 1.5rem;
+      background: #fff;
+      border: 3px dashed #800000;
+      padding: 30px;
+      border-radius: 15px;
+      max-width: 600px;
+      min-height: 120px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 30px;
+      user-select: none;
+    }
+    button {
+      font-size: 1.2rem;
+      background-color: #800000;
+      color: #fff;
+      border: none;
+      padding: 15px 30px;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+    button:hover {
+      background-color: #a03030;
     }
   </style>
 </head>
 <body>
-  <div>
-    Riposa in pace DLO1
-  </div>
+  <h1>Generatore di Cattivi Consigli</h1>
+  <div id="advice">Clicca il bottone per ricevere un cattivo consiglio!</div>
+  <button onclick="newAdvice()">Dammi un cattivo consiglio</button>
+
+  <script>
+    const advices = [
+      "Se hai freddo, mettiti nel frigorifero per riscaldarti rapidamente.",
+      "Quando sei in ritardo, rallenta per far aspettare gli altri.",
+      "Per risparmiare acqua, non lavarti mai le mani.",
+      "Se vuoi perdere un amico, raccontagli tutti i tuoi segreti subito.",
+      "In caso di dubbio, ignora sempre i consigli degli esperti.",
+      "Non usare mai il casco in bicicletta, così sei più coraggioso.",
+      "Quando il telefono suona, lascia sempre che vada alla segreteria.",
+      "Se vuoi che il tuo cane ti ascolti, ignora tutti i suoi comandi.",
+      "Mangia solo dolci per una dieta equilibrata.",
+      "Per avere più followers, compra i loro account falsi.",
+      "Quando studi, guarda la TV per rilassarti (anche se devi passare l’esame).",
+      "Non fare mai il backup dei tuoi file importanti.",
+      "Se ti perdi, non chiedere mai indicazioni a nessuno.",
+      "Quando sei stressato, fai sempre il contrario di quello che ti dicono.",
+      "Se vuoi vincere una discussione, urla più forte.",
+      "Non dormire mai: così sfrutti tutte le 24 ore.",
+      "Perché risparmiare soldi? Spendili tutti subito.",
+      "Quando sei triste, ignora i tuoi amici che vogliono aiutarti.",
+      "Non pulire mai la stanza, così è più ‘viva’.",
+      "Se vuoi essere popolare, ignora tutte le persone che ti parlano.",
+      "Bevi solo caffè per colazione, pranzo e cena.",
+      "Per far piacere agli altri, copia sempre le loro idee.",
+      "Se vuoi fare colpo, racconta sempre barzellette brutte.",
+      "Non rispondere mai alle email importanti.",
+      "Se vuoi avere successo, evita di provare cose nuove.",
+      "Quando ti invitano a una festa, disdici sempre all’ultimo momento.",
+      "Per imparare una lingua, non studiare mai la grammatica.",
+      "Se vuoi dormire bene, guarda film horror prima di andare a letto.",
+      "Non fare mai sport, è una perdita di tempo.",
+      "Quando cucini, non leggere mai la ricetta.",
+      "Se vuoi sembrare intelligente, usa parole complicate a casaccio.",
+      "Per evitare traffico, guida sempre nel centro città all’ora di punta.",
+      "Non fare mai domande in classe o sul lavoro.",
+      "Se vuoi risparmiare tempo, non pianificare mai nulla.",
+      "Mangia solo cibo spazzatura, è più veloce.",
+      "Se ti senti nervoso, bevi un litro di caffeina pura.",
+      "Quando hai un problema, nascondilo sotto il tappeto.",
+      "Non fare mai esercizi di riscaldamento prima dello sport.",
+      "Se vuoi sembrare interessante, parla solo di te.",
+      "Quando fai foto, non sorridere mai.",
+      "Se vuoi perdere il lavoro, arriva sempre in ritardo.",
+      "Non prendere mai appunti, la memoria è più divertente.",
+      "Per avere più amici, ignora tutti i tuoi attuali.",
+      "Se vuoi essere creativo, copia sempre dagli altri.",
+      "Non indossare mai la cintura di sicurezza in auto.",
+      "Se vuoi dimagrire, evita di bere acqua.",
+      "Per una buona impressione, masticare rumorosamente è perfetto.",
+      "Se vuoi essere un buon ascoltatore, interrompi sempre gli altri.",
+      "Non fare mai colazione, è per i deboli.",
+      "Quando guidi, usa sempre il cellulare.",
+      "Se vuoi sembrare occupato, fai sempre molte riunioni inutili.",
+      "Non lavare mai i piatti, lascia tutto sul lavandino.",
+      "Per fare una buona impressione, arriva sempre con 30 minuti di ritardo.",
+      "Se vuoi essere felice, evita di sorridere troppo.",
+      "Quando incontri qualcuno, evita il contatto visivo.",
+      "Non fare mai il bucato, i vestiti sporchi sono una moda.",
+      "Se vuoi far ridere la gente, racconta sempre le stesse barzellette.",
+      "Per rilassarti, fai sempre più cose contemporaneamente.",
+      "Non pulire mai il tuo computer, così è più ‘vintage’.",
+      "Se vuoi fare carriera, sparla di tutti i colleghi.",
+      "Quando mangi fuori, fai sempre il più disordinato possibile.",
+      "Non imparare mai dalle tue esperienze.",
+      "Se vuoi sembrare un esperto, usa sempre termini scientifici senza sapere cosa significano.",
+      "Quando sei in vacanza, non fare mai piani.",
+      "Se vuoi farti licenziare, ignora tutte le email del capo.",
+      "Non fare mai esercizi di stretching.",
+      "Per attirare l’attenzione, urla in pubblico senza motivo.",
+      "Se vuoi avere successo negli incontri, parla solo del tuo ex.",
+      "Non cambiare mai idea, anche se hai torto.",
+      "Quando sei in fila, taglia sempre la fila.",
+      "Se vuoi sembrare affidabile, dimentica sempre gli appuntamenti.",
+      "Non bere mai acqua durante l’allenamento.",
+      "Per evitare le responsabilità, fai sempre finta di non aver sentito.",
+      "Se vuoi essere originale, copia tutto dagli altri.",
+      "Non prepararti mai prima di un esame.",
+      "Quando parli con qualcuno, controlla sempre il telefono.",
+      "Se vuoi far colpo, parla solo di te stesso per ore.",
+      "Non portare mai il cellulare con te, così sei più ‘libero’.",
+      "Per risolvere un problema, ignoralo e sparirà da solo.",
+      "Se vuoi sembrare educato, interrompi sempre gli altri.",
+      "Non lavarti mai i denti dopo aver mangiato dolci.",
+      "Quando vuoi fare amicizia, critica sempre le persone.",
+      "Se vuoi sembrare intelligente, parla con voce molto bassa e lenta.",
+      "Non rispondere mai ai messaggi importanti.",
+      "Per dimagrire, mangia solo dolci dopo cena.",
+      "Se vuoi farti licenziare, ignora tutte le scadenze.",
+      "Non usare mai la mappa quando sei perso.",
+      "Quando guidi, canta sempre a squarciagola.",
+      "Se vuoi risparmiare soldi, non pagare mai le bollette.",
+      "Non imparare mai le lingue straniere.",
+      "Per essere produttivo, passa tutta la giornata a guardare video divertenti.",
+      "Se vuoi fare bella figura, dimentica il nome delle persone.",
+      "Non fare mai esercizio fisico, sedersi è meglio.",
+      "Quando ti senti triste, ignora tutti e stai da solo.",
+      "Se vuoi sembrare gentile, fai sempre complimenti falsi.",
+      "Non lavare mai i vestiti, l’odore è parte del carattere.",
+      "Per essere interessante, racconta sempre storie noiose.",
+      "Se vuoi evitare problemi, non dire mai la verità.",
+      "Quando ti invitano a cena, porta sempre il tuo cibo.",
+      "Non studiare mai per un esame, l’improvvisazione è la chiave.",
+      "Se vuoi sembrare impegnato, apri mille schede del browser.",
+      "Non prenderti mai cura della tua salute.",
+      "Per sembrare più grande, parla come un robot.",
+      "Se vuoi perdere amici, critica tutto ciò che fanno.",
+      "Non rispettare mai le regole del codice stradale.",
+      "Quando cucini, usa sempre troppo sale.",
+      "Se vuoi essere popolare, ignora chi ti vuole bene.",
+      "Non dormire mai abbastanza, è solo una perdita di tempo.",
+      "Per evitare di lavorare, fai sempre finta di essere occupato."
+    ];
+
+    function newAdvice() {
+      const randomIndex = Math.floor(Math.random() * advices.length);
+      document.getElementById('advice').textContent = advices[randomIndex];
+    }
+  </script>
 </body>
 </html>
