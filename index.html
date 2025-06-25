@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Smart Package Scanner</title>
+  <title>Package Scanner</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
     body {
@@ -38,16 +38,14 @@
 <body>
   <h1>Package Scanner</h1>
 
-  <input id="target" type="text" placeholder="Enter target code (e.g. IT1234567890)">
+  <input id="target" type="text" placeholder="Enter last 4 digits (e.g. 1234)">
   <input id="scanner" type="text" placeholder="Scan package" autofocus>
 
   <div id="status">Awaiting scan...</div>
 
-<audio id="successSound" src="https://actions.google.com/sounds/v1/cartoon/cartoon_boing.ogg" preload="auto"></audio>
-<audio id="failSound" src="https://actions.google.com/sounds/v1/alarms/beep_short.ogg" preload="auto"></audio>
-<audio id="invalidSound" src="https://actions.google.com/sounds/v1/cartoon/cartoon_cowbell.ogg" preload="auto"></audio>
-</audio>
-
+  <audio id="successSound" src="https://actions.google.com/sounds/v1/alarms/digital_watch_alarm_short.ogg" preload="auto"></audio>
+  <audio id="failSound" src="https://actions.google.com/sounds/v1/cartoon/cartoon_boing.ogg" preload="auto"></audio>
+  <audio id="invalidSound" src="https://actions.google.com/sounds/v1/alarms/beep_short.ogg" preload="auto"></audio>
 
   <script>
     const targetInput = document.getElementById('target');
@@ -67,20 +65,29 @@
       const target = targetInput.value.trim();
       const scanned = scannerInput.value.trim();
 
-      if (!scanned) return;
+      if (!scanned || !target) return;
 
       if (!isValidCode(scanned)) {
         document.body.style.backgroundColor = 'gold';
         statusDiv.textContent = '⚠️ Invalid Code Format';
-        invalidSound.play();
-      } else if (scanned === target) {
+        try {
+          invalidSound.currentTime = 0;
+          invalidSound.play();
+        } catch (err) {}
+      } else if (scanned.slice(-4) === target) {
         document.body.style.backgroundColor = 'lightgreen';
-        statusDiv.textContent = '✅ Match!';
-        successSound.play();
+        statusDiv.textContent = '✅ Match: Ends in ' + target;
+        try {
+          successSound.currentTime = 0;
+          successSound.play();
+        } catch (err) {}
       } else {
         document.body.style.backgroundColor = 'lightcoral';
-        statusDiv.textContent = '❌ Code does not match';
-        failSound.play();
+        statusDiv.textContent = '❌ Wrong Package';
+        try {
+          failSound.currentTime = 0;
+          failSound.play();
+        } catch (err) {}
       }
 
       scannerInput.value = '';
@@ -96,7 +103,6 @@
       scanTimer = setTimeout(checkCode, 500);
     });
 
-    // Autofocus on load
     window.onload = () => {
       scannerInput.focus();
     };
