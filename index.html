@@ -31,31 +31,45 @@
       font-size: 1.5rem;
       min-height: 2rem;
     }
+    #startButton {
+      font-size: 1.5rem;
+      padding: 1em 2em;
+      margin: 2em auto;
+      border-radius: 10px;
+      border: none;
+      background-color: #007bff;
+      color: white;
+      cursor: pointer;
+    }
   </style>
 </head>
 <body>
   <h1>Package Scanner</h1>
 
-  <input
-    id="target"
-    type="text"
-    maxlength="4"
-    placeholder="Enter last 4 digits (e.g. 1234)"
-    inputmode="numeric"
-    pattern="\d{4}"
-  />
+  <button id="startButton">Tap here to enable sound</button>
 
-  <input
-    id="scanner"
-    type="text"
-    placeholder="Scan package code here"
-    autocomplete="off"
-    autocorrect="off"
-    autocapitalize="off"
-    spellcheck="false"
-  />
+  <div id="scannerUI" style="display:none;">
+    <input
+      id="target"
+      type="text"
+      maxlength="4"
+      placeholder="Enter last 4 digits (e.g. 1234)"
+      inputmode="numeric"
+      pattern="\d{4}"
+    />
 
-  <div id="status">Awaiting scan...</div>
+    <input
+      id="scanner"
+      type="text"
+      placeholder="Scan package code here"
+      autocomplete="off"
+      autocorrect="off"
+      autocapitalize="off"
+      spellcheck="false"
+    />
+
+    <div id="status">Awaiting scan...</div>
+  </div>
 
   <audio
     id="successSound"
@@ -69,36 +83,46 @@
   ></audio>
 
   <script>
+    const startButton = document.getElementById('startButton');
+    const scannerUI = document.getElementById('scannerUI');
     const targetInput = document.getElementById("target");
     const scannerInput = document.getElementById("scanner");
     const statusDiv = document.getElementById("status");
     const successSound = document.getElementById("successSound");
     const failSound = document.getElementById("failSound");
 
-    // Validates if code matches "IT" + 10 digits exactly
+    // Unlock audio playback by playing silent sounds on user tap
+    function unlockAudio() {
+      successSound.play().catch(() => {});
+      failSound.play().catch(() => {});
+    }
+
+    startButton.addEventListener('click', () => {
+      unlockAudio();
+      startButton.style.display = 'none';
+      scannerUI.style.display = 'block';
+      scannerInput.focus();
+    });
+
     function isValidCode(code) {
       return /^IT\d{10}$/.test(code);
     }
 
-    // Main check after scan input is complete
     function checkCode() {
       const target = targetInput.value.trim();
       const scanned = scannerInput.value.trim();
 
       if (!scanned || target.length !== 4 || !/^\d{4}$/.test(target)) {
-        // Don't proceed if target is not exactly 4 digits or no scan input
         return;
       }
 
       if (!isValidCode(scanned)) {
-        // Invalid format: yellow + vibrate only
         document.body.style.backgroundColor = "gold";
         statusDiv.textContent = "⚠️ Invalid Code Format";
         try {
           navigator.vibrate([100, 100, 100]);
         } catch (err) {}
       } else if (scanned.slice(-4) === target) {
-        // Match: green + success sound
         document.body.style.backgroundColor = "lightgreen";
         statusDiv.textContent = "✅ Match: Ends in " + target;
         try {
@@ -106,7 +130,6 @@
           successSound.play();
         } catch (err) {}
       } else {
-        // Valid but wrong last 4 digits: red + fail sound
         document.body.style.backgroundColor = "lightcoral";
         statusDiv.textContent = "❌ Wrong Package";
         try {
@@ -115,7 +138,6 @@
         } catch (err) {}
       }
 
-      // Clear scan input and reset after 1.5 seconds
       scannerInput.value = "";
       setTimeout(() => {
         document.body.style.backgroundColor = "white";
@@ -129,10 +151,6 @@
       if (scanTimer) clearTimeout(scanTimer);
       scanTimer = setTimeout(checkCode, 400);
     });
-
-    window.onload = () => {
-      scannerInput.focus();
-    };
   </script>
 </body>
 </html>
