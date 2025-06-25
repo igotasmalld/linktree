@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Smart Package Scanner</title>
+  <title>Package Scanner</title>
   <style>
     body {
       font-family: sans-serif;
@@ -39,7 +39,6 @@
 
   <div id="status">Awaiting scan...</div>
 
-  <!-- New Sound -->
   <audio id="success" src="https://actions.google.com/sounds/v1/alarms/beep_short.ogg" preload="auto"></audio>
   <audio id="fail" src="https://actions.google.com/sounds/v1/cartoon/cartoon_boing.ogg" preload="auto"></audio>
 
@@ -49,6 +48,8 @@
     const statusDiv = document.getElementById('status');
     const successSound = document.getElementById('success');
     const failSound = document.getElementById('fail');
+
+    let scanTimer = null;
 
     function checkCode() {
       const target = targetInput.value.trim();
@@ -79,20 +80,12 @@
     }
 
     scannerInput.addEventListener('input', () => {
-      // Many scanner apps auto-press enter after scan
-      if (scannerInput.value.endsWith('\n')) {
-        scannerInput.value = scannerInput.value.trim();
-        checkCode();
-      }
+      // Reset and start a new 500ms timer every time input changes
+      if (scanTimer) clearTimeout(scanTimer);
+      scanTimer = setTimeout(checkCode, 500);
     });
 
-    scannerInput.addEventListener('keypress', (e) => {
-      if (e.key === 'Enter') {
-        checkCode();
-      }
-    });
-
-    // Autofocus on load
+    // Autofocus on page load
     window.onload = () => {
       scannerInput.focus();
     };
