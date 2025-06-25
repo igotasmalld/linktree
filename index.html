@@ -1,106 +1,133 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
   <title>Package Scanner</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <style>
     body {
-      font-family: sans-serif;
+      font-family: Arial, sans-serif;
       text-align: center;
-      transition: background-color 0.3s ease;
-      background-color: white;
       padding: 2em;
+      background-color: white;
+      transition: background-color 0.3s ease;
     }
-
     h1 {
       font-size: 2rem;
       margin-bottom: 1rem;
     }
-
     input {
       font-size: 1.2rem;
       padding: 0.8em;
       margin: 0.5em auto;
       width: 100%;
       max-width: 400px;
-      box-sizing: border-box;
       border: 2px solid #ccc;
       border-radius: 8px;
+      box-sizing: border-box;
     }
-
     #status {
-      font-size: 1.5rem;
       margin-top: 1.5em;
+      font-size: 1.5rem;
+      min-height: 2rem;
     }
   </style>
 </head>
 <body>
   <h1>Package Scanner</h1>
 
-  <input id="target" type="text" placeholder="Enter last 4 digits (e.g. 1234)">
-  <input id="scanner" type="text" placeholder="Scan package" autofocus>
+  <input
+    id="target"
+    type="text"
+    maxlength="4"
+    placeholder="Enter last 4 digits (e.g. 1234)"
+    inputmode="numeric"
+    pattern="\d{4}"
+  />
+
+  <input
+    id="scanner"
+    type="text"
+    placeholder="Scan package code here"
+    autocomplete="off"
+    autocorrect="off"
+    autocapitalize="off"
+    spellcheck="false"
+  />
 
   <div id="status">Awaiting scan...</div>
 
-  <audio id="successSound" src="https://actions.google.com/sounds/v1/alarms/digital_watch_alarm_short.ogg" preload="auto"></audio>
-  <audio id="failSound" src="https://actions.google.com/sounds/v1/cartoon/cartoon_boing.ogg" preload="auto"></audio>
-  <audio id="invalidSound" src="https://actions.google.com/sounds/v1/alarms/beep_short.ogg" preload="auto"></audio>
+  <audio
+    id="successSound"
+    src="https://actions.google.com/sounds/v1/alarms/digital_watch_alarm_short.ogg"
+    preload="auto"
+  ></audio>
+  <audio
+    id="failSound"
+    src="https://actions.google.com/sounds/v1/cartoon/cartoon_boing.ogg"
+    preload="auto"
+  ></audio>
 
   <script>
-    const targetInput = document.getElementById('target');
-    const scannerInput = document.getElementById('scanner');
-    const statusDiv = document.getElementById('status');
-    const successSound = document.getElementById('successSound');
-    const failSound = document.getElementById('failSound');
-    const invalidSound = document.getElementById('invalidSound');
+    const targetInput = document.getElementById("target");
+    const scannerInput = document.getElementById("scanner");
+    const statusDiv = document.getElementById("status");
+    const successSound = document.getElementById("successSound");
+    const failSound = document.getElementById("failSound");
 
-    let scanTimer = null;
-
+    // Validates if code matches "IT" + 10 digits exactly
     function isValidCode(code) {
       return /^IT\d{10}$/.test(code);
     }
 
+    // Main check after scan input is complete
     function checkCode() {
       const target = targetInput.value.trim();
       const scanned = scannerInput.value.trim();
 
-      if (!scanned || !target) return;
+      if (!scanned || target.length !== 4 || !/^\d{4}$/.test(target)) {
+        // Don't proceed if target is not exactly 4 digits or no scan input
+        return;
+      }
 
       if (!isValidCode(scanned)) {
-        document.body.style.backgroundColor = 'gold';
-        statusDiv.textContent = '⚠️ Invalid Code Format';
+        // Invalid format: yellow + vibrate only
+        document.body.style.backgroundColor = "gold";
+        statusDiv.textContent = "⚠️ Invalid Code Format";
         try {
-          invalidSound.currentTime = 0;
-          invalidSound.play();
+          navigator.vibrate([100, 100, 100]);
         } catch (err) {}
       } else if (scanned.slice(-4) === target) {
-        document.body.style.backgroundColor = 'lightgreen';
-        statusDiv.textContent = '✅ Match: Ends in ' + target;
+        // Match: green + success sound
+        document.body.style.backgroundColor = "lightgreen";
+        statusDiv.textContent = "✅ Match: Ends in " + target;
         try {
           successSound.currentTime = 0;
           successSound.play();
         } catch (err) {}
       } else {
-        document.body.style.backgroundColor = 'lightcoral';
-        statusDiv.textContent = '❌ Wrong Package';
+        // Valid but wrong last 4 digits: red + fail sound
+        document.body.style.backgroundColor = "lightcoral";
+        statusDiv.textContent = "❌ Wrong Package";
         try {
           failSound.currentTime = 0;
           failSound.play();
         } catch (err) {}
       }
 
-      scannerInput.value = '';
+      // Clear scan input and reset after 1.5 seconds
+      scannerInput.value = "";
       setTimeout(() => {
-        document.body.style.backgroundColor = 'white';
-        statusDiv.textContent = 'Awaiting scan...';
+        document.body.style.backgroundColor = "white";
+        statusDiv.textContent = "Awaiting scan...";
         scannerInput.focus();
       }, 1500);
     }
 
-    scannerInput.addEventListener('input', () => {
+    let scanTimer = null;
+    scannerInput.addEventListener("input", () => {
       if (scanTimer) clearTimeout(scanTimer);
-      scanTimer = setTimeout(checkCode, 500);
+      scanTimer = setTimeout(checkCode, 400);
     });
 
     window.onload = () => {
