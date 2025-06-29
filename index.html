@@ -2,31 +2,49 @@
 <html lang="it">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Verifica Tracking ID</title>
   <style>
-    body {
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
       background-color: black;
       color: white;
       font-family: Arial, sans-serif;
+      overflow: hidden;
+    }
+    #wrapper {
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
       text-align: center;
       padding: 20px;
+      box-sizing: border-box;
     }
-    #scannerInput {
+    textarea, input {
       font-size: 24px;
       padding: 10px;
-      width: 300px;
+      width: 90%;
+      max-width: 400px;
+      margin-bottom: 20px;
+      border-radius: 8px;
+      border: none;
+    }
+    button {
+      font-size: 24px;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 8px;
+      background-color: white;
+      color: black;
+      cursor: pointer;
     }
     #status {
       font-size: 32px;
       margin-top: 20px;
-    }
-    #wrapper {
-      transition: background-color 0.3s ease;
-      padding: 50px;
-      border-radius: 10px;
-    }
-    #idsInput {
-      margin-bottom: 20px;
     }
     .hidden {
       display: none;
@@ -35,14 +53,14 @@
 </head>
 <body>
   <div id="wrapper">
-    <h1>Verifica Pacco</h1>
     <div id="step1">
+      <h1>Verifica Pacco</h1>
       <p>Inserisci le ultime 4 o 5 cifre dei tracking ID (uno per riga):</p>
-      <textarea id="idsInput" rows="10" cols="30" placeholder="Es: 1234\n56789"></textarea><br>
+      <textarea id="idsInput" rows="10" placeholder="Es: 1234\n56789"></textarea><br>
       <button onclick="confermaLista()">Conferma Lista</button>
     </div>
     <div id="step2" class="hidden">
-      <p>Scannerizza i pacchi:</p>
+      <h1>Scannerizza i pacchi</h1>
       <input type="text" id="scannerInput" autofocus placeholder="Scansiona qui" oninput="verificaCodice(this.value)">
       <div id="status"></div>
     </div>
@@ -55,6 +73,13 @@
   <script>
     let ultimiCifre = [];
 
+    function cambiaColore(colore) {
+      document.body.style.backgroundColor = colore;
+      setTimeout(() => {
+        document.body.style.backgroundColor = 'black';
+      }, 800);
+    }
+
     function confermaLista() {
       const rawInput = document.getElementById('idsInput').value.trim().split("\n");
       ultimiCifre = rawInput.map(r => r.trim()).filter(r => r.length >= 4);
@@ -64,26 +89,25 @@
     }
 
     function verificaCodice(valore) {
-      if (valore.length < 12) return; // BA+10 numeri = 12
+      if (valore.length < 12) return;
 
-      const wrapper = document.getElementById('wrapper');
-      const status = document.getElementById('status');
       const input = document.getElementById('scannerInput');
+      const status = document.getElementById('status');
 
       const formatoValido = /^BA\d{10}$/;
       if (!formatoValido.test(valore)) {
-        wrapper.style.backgroundColor = 'yellow';
-        status.textContent = 'Formato non valido';
+        cambiaColore('yellow');
+        status.textContent = '⚠️ Formato non valido';
         document.getElementById('suonoGiallo').play();
       } else {
         const ultime = valore.slice(-5);
         const ultime4 = valore.slice(-4);
         if (ultimiCifre.includes(ultime) || ultimiCifre.includes(ultime4)) {
-          wrapper.style.backgroundColor = 'green';
+          cambiaColore('green');
           status.textContent = '✅ Pacco trovato!';
           document.getElementById('suonoVerde').play();
         } else {
-          wrapper.style.backgroundColor = 'red';
+          cambiaColore('red');
           status.textContent = '❌ Non è il pacco giusto';
           document.getElementById('suonoRosso').play();
         }
