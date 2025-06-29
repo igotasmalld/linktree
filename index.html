@@ -68,16 +68,16 @@
   // Suoni distinti per i tre casi
   function beepGreen() {
     // Beep breve e acuto
-    playBeep(1046, 150, 'square');
+    playBeep(1046, 120, 'square');
   }
   function beepRed() {
     // Beep più lungo e grave
-    playBeep(220, 350, 'sine');
+    playBeep(196, 350, 'sine');
   }
   function beepYellow() {
     // Due beep veloci diversi
-    playBeep(523, 80, 'triangle', () => {
-      setTimeout(() => playBeep(784, 80, 'triangle'), 90);
+    playBeep(523, 70, 'triangle', () => {
+      setTimeout(() => playBeep(784, 70, 'triangle'), 80);
     });
   }
   // Funzione generica beep
@@ -109,23 +109,14 @@
     }
   }
 
-  // Impedisci che il focus cambi nella prima casella con invio/enter
-  last4Input.addEventListener('keydown', (e) => {
-    if (e.key === "Enter" || e.key === "Tab") {
-      e.preventDefault();
-      // Rimani nel campo
-      last4Input.focus();
-    }
-  });
-
-  // Permetti solo numeri nella prima casella
+  // Solo numeri nella prima casella (ultime 4 cifre)
   last4Input.addEventListener('input', () => {
     last4Input.value = last4Input.value.replace(/\D/g, '').slice(0,4);
     body.style.backgroundColor = 'black';
-    scanInput.value = '';
-    scanInput.focus();
+    // Non toccare focus, non fare altro!
   });
 
+  // Gestione scansione
   scanInput.addEventListener('input', () => {
     const last4 = last4Input.value.trim();
     const code = scanInput.value.trim().toUpperCase();
@@ -152,6 +143,7 @@
     scanInput.focus();
   });
 
+  // All'avvio, metti il focus sulla prima casella
   window.addEventListener('load', () => {
     last4Input.focus();
   });
