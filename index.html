@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="it">
+<html lang="en">
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Ricerca Pacco Tracking</title>
+<title>Parcel Tracking Finder</title>
 <style>
   body {
     margin: 0;
@@ -53,11 +53,11 @@
 </head>
 <body>
   <div class="container">
-    <label for="last4">Inserisci ultime 4 cifre tracking ID:</label>
-    <input type="text" id="last4" maxlength="4" placeholder="Esempio: 7890" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" inputmode="numeric" />
+    <label for="last4">Enter last 4 digits of tracking ID:</label>
+    <input type="text" id="last4" maxlength="4" placeholder="e.g. 7890" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" inputmode="numeric" />
 
-    <label for="scan">Scannerizza o inserisci il codice completo:</label>
-    <input type="text" id="scan" maxlength="12" placeholder="Formato: BA1234567890" autocomplete="off" autocorrect="off" autocapitalize="characters" spellcheck="false" />
+    <label for="scan">Scan or enter the full tracking code:</label>
+    <input type="text" id="scan" maxlength="20" placeholder="Format: BA1234567890" autocomplete="off" autocorrect="off" autocapitalize="characters" spellcheck="false" />
   </div>
 
 <script>
@@ -65,22 +65,18 @@
   const scanInput = document.getElementById('scan');
   const body = document.body;
 
-  // Suoni distinti per i tre casi
+  // Three different beeps for each case
   function beepGreen() {
-    // Beep breve e acuto
     playBeep(1046, 120, 'square');
   }
   function beepRed() {
-    // Beep più lungo e grave
     playBeep(196, 350, 'sine');
   }
   function beepYellow() {
-    // Due beep veloci diversi
     playBeep(523, 70, 'triangle', () => {
       setTimeout(() => playBeep(784, 70, 'triangle'), 80);
     });
   }
-  // Funzione generica beep
   function playBeep(freq = 440, duration = 150, type = 'square', onEnded = null) {
     const ctx = new (window.AudioContext || window.webkitAudioContext)();
     const oscillator = ctx.createOscillator();
@@ -109,22 +105,18 @@
     }
   }
 
-  // Solo numeri nella prima casella (ultime 4 cifre)
+  // Only allow numbers in the last4 input
   last4Input.addEventListener('input', () => {
     last4Input.value = last4Input.value.replace(/\D/g, '').slice(0,4);
     body.style.backgroundColor = 'black';
-    // Non toccare focus, non fare altro!
   });
 
-  // Gestione scansione
-  scanInput.addEventListener('input', () => {
+  // When scanning, process on Enter or Tab or when input loses focus (blur)
+  function processScan() {
     const last4 = last4Input.value.trim();
     const code = scanInput.value.trim().toUpperCase();
 
-    if (code.length < 12) {
-      // Aspetta codice completo
-      return;
-    }
+    if (!code) return;
 
     if (!isValidTracking(code)) {
       updateResult('yellow');
@@ -138,12 +130,27 @@
         updateResult('red');
       }
     }
-    // Pulisci e rimetti focus per scansione continua
     scanInput.value = '';
     scanInput.focus();
+  }
+
+  scanInput.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' || e.key === 'Tab') {
+      e.preventDefault();
+      processScan();
+    }
   });
 
-  // All'avvio, metti il focus sulla prima casella
+  // Also process automatically when the scanner fills the field in one go (some scanners do not send Enter)
+  scanInput.addEventListener('input', () => {
+    // If the scanner fills the code in one shot, process immediately
+    // (You can adjust the min length if you want, here it processes any non-empty code)
+    if (scanInput.value.length >= 6) { // Accept short codes too
+      processScan();
+    }
+  });
+
+  // On page load, focus on the last4 input
   window.addEventListener('load', () => {
     last4Input.focus();
   });
