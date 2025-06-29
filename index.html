@@ -65,7 +65,7 @@
   const scanInput = document.getElementById('scan');
   const body = document.body;
 
-  // Three different beeps for each case
+  // Beep sounds for different cases
   function beepGreen() {
     playBeep(1046, 120, 'square');
   }
@@ -111,12 +111,15 @@
     body.style.backgroundColor = 'black';
   });
 
-  // When scanning, process on Enter or Tab or when input loses focus (blur)
-  function processScan() {
+  // Process scanned code immediately when input changes and length >= 6
+  scanInput.addEventListener('input', () => {
     const last4 = last4Input.value.trim();
     const code = scanInput.value.trim().toUpperCase();
 
-    if (!code) return;
+    if (code.length < 6) {
+      // Wait for more input before processing
+      return;
+    }
 
     if (!isValidTracking(code)) {
       updateResult('yellow');
@@ -130,27 +133,24 @@
         updateResult('red');
       }
     }
+
+    // Clear input and keep focus for next scan
     scanInput.value = '';
     scanInput.focus();
-  }
+  });
 
+  // Optional: also process on Enter or Tab key (if scanner sends it)
   scanInput.addEventListener('keydown', (e) => {
     if (e.key === 'Enter' || e.key === 'Tab') {
       e.preventDefault();
-      processScan();
+      // Just in case input is not processed yet
+      const code = scanInput.value.trim().toUpperCase();
+      if (code.length > 0) {
+        scanInput.dispatchEvent(new Event('input'));
+      }
     }
   });
 
-  // Also process automatically when the scanner fills the field in one go (some scanners do not send Enter)
-  scanInput.addEventListener('input', () => {
-    // If the scanner fills the code in one shot, process immediately
-    // (You can adjust the min length if you want, here it processes any non-empty code)
-    if (scanInput.value.length >= 6) { // Accept short codes too
-      processScan();
-    }
-  });
-
-  // On page load, focus on the last4 input
   window.addEventListener('load', () => {
     last4Input.focus();
   });
