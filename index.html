@@ -2,155 +2,106 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Package Scanner</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Package Finder</title>
   <style>
     body {
-      font-family: Arial, sans-serif;
-      text-align: center;
-      padding: 2em;
-      background-color: white;
-      transition: background-color 0.3s ease;
-    }
-    h1 {
-      font-size: 2rem;
-      margin-bottom: 1rem;
-    }
-    input {
-      font-size: 1.2rem;
-      padding: 0.8em;
-      margin: 0.5em auto;
-      width: 100%;
-      max-width: 400px;
-      border: 2px solid #ccc;
-      border-radius: 8px;
-      box-sizing: border-box;
-    }
-    #status {
-      margin-top: 1.5em;
-      font-size: 1.5rem;
-      min-height: 2rem;
-    }
-    #startButton {
-      font-size: 1.5rem;
-      padding: 1em 2em;
-      margin: 2em auto;
-      border-radius: 10px;
-      border: none;
-      background-color: #007bff;
+      background-color: black;
       color: white;
+      font-family: sans-serif;
+      text-align: center;
+      padding-top: 50px;
+    }
+    .hidden {
+      display: none;
+    }
+    .input-field {
+      margin: 10px;
+      padding: 10px;
+      font-size: 1.2rem;
+    }
+    .btn {
+      padding: 10px 20px;
+      font-size: 1.2rem;
+      background-color: yellow;
+      border: none;
       cursor: pointer;
+    }
+    .screen-yellow {
+      background-color: yellow;
+      color: black;
+    }
+    .screen-red {
+      background-color: red;
+    }
+    .screen-green {
+      background-color: green;
     }
   </style>
 </head>
 <body>
-  <h1>Package Scanner</h1>
-
-  <button id="startButton">Tap here to enable sound</button>
-
-  <div id="scannerUI" style="display:none;">
-    <input
-      id="target"
-      type="text"
-      maxlength="4"
-      placeholder="Enter last 4 digits (e.g. 1234)"
-      inputmode="numeric"
-      pattern="\d{4}"
-    />
-
-    <input
-      id="scanner"
-      type="text"
-      placeholder="Scan package code here"
-      autocomplete="off"
-      autocorrect="off"
-      autocapitalize="off"
-      spellcheck="false"
-    />
-
-    <div id="status">Awaiting scan...</div>
+  <div id="auth-screen">
+    <h1>Enter Password</h1>
+    <input type="password" id="password" class="input-field" />
+    <button class="btn" onclick="checkPassword()">Enter</button>
   </div>
 
-  <audio
-    id="successSound"
-    src="https://actions.google.com/sounds/v1/alarms/digital_watch_alarm_short.ogg"
-    preload="auto"
-  ></audio>
-  <audio
-    id="failSound"
-    src="https://actions.google.com/sounds/v1/cartoon/cartoon_boing.ogg"
-    preload="auto"
-  ></audio>
+  <div id="code1-screen" class="hidden">
+    <h1>Enter Code 1</h1>
+    <input type="text" id="code1" class="input-field" maxlength="12" />
+    <button class="btn" onclick="nextStep()">OK</button>
+  </div>
+
+  <div id="code2-screen" class="hidden">
+    <h1>Enter Code 2</h1>
+    <input type="text" id="code2" class="input-field" maxlength="12" oninput="checkCode2()" />
+  </div>
+
+  <audio id="sound-yellow" src="https://www.soundjay.com/buttons/sounds/button-10.mp3"></audio>
+  <audio id="sound-red" src="https://www.soundjay.com/button/sounds/button-3.mp3"></audio>
+  <audio id="sound-green" src="https://www.soundjay.com/human/sounds/applause-8.mp3"></audio>
 
   <script>
-    const startButton = document.getElementById('startButton');
-    const scannerUI = document.getElementById('scannerUI');
-    const targetInput = document.getElementById("target");
-    const scannerInput = document.getElementById("scanner");
-    const statusDiv = document.getElementById("status");
-    const successSound = document.getElementById("successSound");
-    const failSound = document.getElementById("failSound");
-
-    // Unlock audio playback by playing silent sounds on user tap
-    function unlockAudio() {
-      successSound.play().catch(() => {});
-      failSound.play().catch(() => {});
-    }
-
-    startButton.addEventListener('click', () => {
-      unlockAudio();
-      startButton.style.display = 'none';
-      scannerUI.style.display = 'block';
-      scannerInput.focus();
-    });
-
-    function isValidCode(code) {
-      return /^IT\d{10}$/.test(code);
-    }
-
-    function checkCode() {
-      const target = targetInput.value.trim();
-      const scanned = scannerInput.value.trim();
-
-      if (!scanned || target.length !== 4 || !/^\d{4}$/.test(target)) {
-        return;
+    function checkPassword() {
+      const pass = document.getElementById("password").value;
+      if (pass === "bugha") {
+        document.getElementById("auth-screen").classList.add("hidden");
+        document.getElementById("code1-screen").classList.remove("hidden");
       }
+    }
 
-      if (!isValidCode(scanned)) {
-        document.body.style.backgroundColor = "gold";
-        statusDiv.textContent = "⚠️ Invalid Code Format";
-        try {
-          navigator.vibrate([100, 100, 100]);
-        } catch (err) {}
-      } else if (scanned.slice(-4) === target) {
-        document.body.style.backgroundColor = "lightgreen";
-        statusDiv.textContent = "✅ Match: Ends in " + target;
-        try {
-          successSound.currentTime = 0;
-          successSound.play();
-        } catch (err) {}
+    let storedCode1 = "";
+
+    function nextStep() {
+      storedCode1 = document.getElementById("code1").value.trim();
+      if (/^BA\d{10}$/.test(storedCode1)) {
+        document.getElementById("code1-screen").classList.add("hidden");
+        document.getElementById("code2-screen").classList.remove("hidden");
       } else {
-        document.body.style.backgroundColor = "lightcoral";
-        statusDiv.textContent = "❌ Wrong Package";
-        try {
-          failSound.currentTime = 0;
-          failSound.play();
-        } catch (err) {}
+        alert("Code 1 format is invalid. Format: BA followed by 10 digits.");
       }
-
-      scannerInput.value = "";
-      setTimeout(() => {
-        document.body.style.backgroundColor = "white";
-        statusDiv.textContent = "Awaiting scan...";
-        scannerInput.focus();
-      }, 1500);
     }
 
-    let scanTimer = null;
-    scannerInput.addEventListener("input", () => {
-      if (scanTimer) clearTimeout(scanTimer);
-      scanTimer = setTimeout(checkCode, 400);
-    });
+    function checkCode2() {
+      const code2 = document.getElementById("code2").value.trim();
+      const body = document.body;
+      const yellowSound = document.getElementById("sound-yellow");
+      const redSound = document.getElementById("sound-red");
+      const greenSound = document.getElementById("sound-green");
+
+      if (code2.length === 12) {
+        if (!/^BA\d{10}$/.test(code2)) {
+          body.className = "screen-yellow";
+          yellowSound.play();
+        } else if (code2 !== storedCode1) {
+          body.className = "screen-red";
+          redSound.play();
+        } else {
+          body.className = "screen-green";
+          greenSound.play();
+        }
+      }
+    }
   </script>
 </body>
 </html>
