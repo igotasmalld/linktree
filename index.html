@@ -73,4 +73,90 @@
 </div>
 
 <script>
-  // Hardcoded passwo
+  // Hardcoded password (modifica qui)
+  const PASSWORD = "1234";
+
+  const loginDiv = document.getElementById("loginDiv");
+  const appDiv = document.getElementById("appDiv");
+  const loginBtn = document.getElementById("loginBtn");
+  const passwordInput = document.getElementById("passwordInput");
+  const loginMsg = document.getElementById("loginMsg");
+
+  const partialIdInput = document.getElementById("partialIdInput");
+  const confirmListBtn = document.getElementById("confirmListBtn");
+  const scannerDiv = document.getElementById("scannerDiv");
+  const scanInput = document.getElementById("scanInput");
+  const statusText = document.getElementById("statusText");
+
+  // Suoni
+  const audioCorrect = new Audio("https://actions.google.com/sounds/v1/human_voices/applause.ogg");
+  const audioWrong = new Audio("https://actions.google.com/sounds/v1/cartoon/clang_and_wobble.ogg");
+  const audioFormat = new Audio("https://actions.google.com/sounds/v1/alarms/beep_short.ogg");
+
+  // Stato
+  let partialId = "";
+  let confirmed = false;
+
+  // Login
+  loginBtn.addEventListener("click", () => {
+    if (passwordInput.value === PASSWORD) {
+      loginDiv.style.display = "none";
+      appDiv.style.display = "block";
+    } else {
+      loginMsg.textContent = "Password errata";
+    }
+  });
+
+  // Abilita bottone conferma solo se input valido (4 o 5 cifre numeriche)
+  partialIdInput.addEventListener("input", () => {
+    const val = partialIdInput.value.trim();
+    confirmListBtn.disabled = !(val.length >= 4 && val.length <= 5 && /^\d{4,5}$/.test(val));
+  });
+
+  confirmListBtn.addEventListener("click", () => {
+    partialId = partialIdInput.value.trim();
+    confirmed = true;
+    partialIdInput.disabled = true;
+    confirmListBtn.disabled = true;
+    scannerDiv.style.display = "block";
+    scanInput.focus();
+  });
+
+  // Funzione per controllare formato BA + 10 numeri
+  function isValidFormat(code) {
+    return /^BA\d{10}$/.test(code);
+  }
+
+  scanInput.addEventListener("keydown", (e) => {
+    if (e.key === "Enter") {
+      const code = scanInput.value.trim().toUpperCase();
+      scanInput.value = "";
+
+      if (!isValidFormat(code)) {
+        // Formato errato
+        document.body.style.backgroundColor = "yellow";
+        statusText.textContent = "Formato codice errato!";
+        audioFormat.play();
+      } else if (code.endsWith(partialId)) {
+        // Codice corretto (match ultime cifre)
+        document.body.style.backgroundColor = "green";
+        statusText.textContent = "Pacco trovato!";
+        audioCorrect.play();
+      } else {
+        // Codice formato giusto ma non match
+        document.body.style.backgroundColor = "red";
+        statusText.textContent = "Pacco non corretto!";
+        audioWrong.play();
+      }
+
+      // Dopo 2 secondi torna nero
+      setTimeout(() => {
+        document.body.style.backgroundColor = "black";
+        statusText.textContent = "";
+      }, 2000);
+    }
+  });
+
+</script>
+</body>
+</html>
