@@ -3,176 +3,124 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Scanner Tracking ID</title>
+<title>Ricerca Pacco Tracking</title>
 <style>
   body {
     margin: 0;
-    font-family: Arial, sans-serif;
     background-color: black;
     color: white;
+    font-family: Arial, sans-serif;
     display: flex;
     flex-direction: column;
-    height: 100vh;
-    justify-content: center;
     align-items: center;
-    text-align: center;
-    user-select: none;
+    justify-content: center;
+    height: 100vh;
+    transition: background-color 0.3s ease;
+    padding: 1rem;
   }
-  #login, #main {
-    width: 90%;
-    max-width: 400px;
-  }
-  input[type="password"], input[type="text"] {
-    width: 100%;
-    padding: 12px;
-    margin: 10px 0 20px;
+  label {
     font-size: 1.2rem;
-    border: none;
-    border-radius: 6px;
+    margin-top: 1rem;
   }
-  button {
-    width: 100%;
-    padding: 14px;
-    font-size: 1.3rem;
-    background-color: #444;
-    border: none;
-    border-radius: 6px;
-    color: white;
-    cursor: pointer;
-    user-select: none;
-  }
-  button:active {
-    background-color: #666;
-  }
-  #status {
-    margin-top: 30px;
+  input {
     font-size: 1.5rem;
-    min-height: 2em;
+    padding: 0.5rem;
+    margin-top: 0.5rem;
+    width: 100%;
+    max-width: 300px;
+    border-radius: 5px;
+    border: none;
+    outline: none;
+  }
+  input:focus {
+    outline: 2px solid white;
+  }
+  .container {
+    width: 100%;
+    max-width: 320px;
+  }
+  @media (max-width: 400px) {
+    input {
+      font-size: 1.2rem;
+    }
+    label {
+      font-size: 1rem;
+    }
   }
 </style>
 </head>
 <body>
+  <div class="container">
+    <label for="last4">Inserisci ultime 4 cifre tracking ID:</label>
+    <input type="text" id="last4" maxlength="4" pattern="\d{4}" inputmode="numeric" placeholder="Esempio: 7890" />
 
-<div id="login">
-  <h1>Accesso</h1>
-  <input id="passwordInput" type="password" placeholder="Inserisci password" autocomplete="off" />
-  <button id="loginBtn">Accedi</button>
-  <p id="loginError" style="color: #f44; display:none;">Password errata</p>
-</div>
+    <label for="scan">Scannerizza o inserisci il codice completo:</label>
+    <input type="text" id="scan" maxlength="12" placeholder="Formato: BA1234567890" autocomplete="off" autocorrect="off" autocapitalize="characters" />
 
-<div id="main" style="display:none;">
-  <h1>Ricerca Tracking ID</h1>
-  <p>Inserisci ultime 4 o 5 cifre del tracking ID (es. 1234 o 12345)</p>
-  <input id="partialId" type="text" maxlength="5" pattern="\d{4,5}" placeholder="Ultime 4 o 5 cifre" autocomplete="off" />
-  <button id="confirmListBtn">Conferma Lista</button>
-
-  <div id="scannerArea" style="display:none; margin-top: 20px;">
-    <p>Scannerizza i codici ora...</p>
-    <input id="scannerInput" type="text" autocomplete="off" autofocus style="opacity:0; position:absolute; pointer-events:none;" />
   </div>
 
-  <div id="status"></div>
-</div>
-
-<audio id="clapSound" src="https://actions.google.com/sounds/v1/applause/applause_01.wav" preload="auto"></audio>
-<audio id="beepSound" src="https://actions.google.com/sounds/v1/cartoon/wood_plank_flicks.ogg" preload="auto"></audio>
-<audio id="alertSound" src="https://actions.google.com/sounds/v1/alarms/beep_short.ogg" preload="auto"></audio>
-
 <script>
-  const PASSWORD = "1234"; // cambia password qui
-  const loginDiv = document.getElementById('login');
-  const mainDiv = document.getElementById('main');
-  const loginBtn = document.getElementById('loginBtn');
-  const passwordInput = document.getElementById('passwordInput');
-  const loginError = document.getElementById('loginError');
+  // Funzione per riprodurre un beep breve
+  function playBeep() {
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    const oscillator = ctx.createOscillator();
+    oscillator.type = 'square';
+    oscillator.frequency.setValueAtTime(440, ctx.currentTime); // La4
+    oscillator.connect(ctx.destination);
+    oscillator.start();
+    oscillator.stop(ctx.currentTime + 0.15); // 150ms beep
+  }
 
-  const partialIdInput = document.getElementById('partialId');
-  const confirmListBtn = document.getElementById('confirmListBtn');
-  const scannerArea = document.getElementById('scannerArea');
-  const scannerInput = document.getElementById('scannerInput');
-  const statusDiv = document.getElementById('status');
+  const last4Input = document.getElementById('last4');
+  const scanInput = document.getElementById('scan');
+  const body = document.body;
 
-  const clapSound = document.getElementById('clapSound');
-  const beepSound = document.getElementById('beepSound');
-  const alertSound = document.getElementById('alertSound');
-
-  let partialId = "";
-  let listConfirmed = false;
-
-  // Login
-  loginBtn.addEventListener('click', () => {
-    if (passwordInput.value === PASSWORD) {
-      loginError.style.display = 'none';
-      loginDiv.style.display = 'none';
-      mainDiv.style.display = 'block';
-      partialIdInput.focus();
-    } else {
-      loginError.style.display = 'block';
-    }
-  });
-
-  // Conferma lista
-  confirmListBtn.addEventListener('click', () => {
-    const val = partialIdInput.value.trim();
-    if (!/^\d{4,5}$/.test(val)) {
-      alert('Inserisci 4 o 5 cifre numeriche!');
-      partialIdInput.focus();
-      return;
-    }
-    partialId = val;
-    listConfirmed = true;
-    confirmListBtn.disabled = true;
-    partialIdInput.disabled = true;
-    scannerArea.style.display = 'block';
-    statusDiv.textContent = "In attesa di scannerizzazione...";
-    scannerInput.focus();
-  });
-
-  // Funzione controllo formato tracking id
-  function isValidFormat(code) {
+  // Funzione per validare il formato BA + 10 numeri
+  function isValidTracking(code) {
     return /^BA\d{10}$/.test(code);
   }
 
-  // Funzione per suonare e cambiare colore sfondo
-  function showFeedback(color, sound) {
-    document.body.style.backgroundColor = color;
-    sound.currentTime = 0;
-    sound.play();
-    setTimeout(() => {
-      document.body.style.backgroundColor = 'black';
-    }, 1200);
+  // Funzione per aggiornare lo sfondo e suonare beep
+  function updateResult(color) {
+    body.style.backgroundColor = color;
+    playBeep();
   }
 
-  // Gestione scanner input
-  scannerInput.addEventListener('input', () => {
-    let code = scannerInput.value.trim().toUpperCase();
-    if (code.length === 12) {
-      // Controlla formato
-      if (!isValidFormat(code)) {
-        // Formato errato
-        showFeedback('yellow', alertSound);
-        statusDiv.textContent = `Codice non valido: ${code}`;
-      } else {
-        // Formato corretto
-        if (code.endsWith(partialId)) {
-          // Trovato!
-          showFeedback('green', clapSound);
-          statusDiv.textContent = `PACCO TROVATO! Codice: ${code}`;
-        } else {
-          // Non è il pacco giusto
-          showFeedback('red', beepSound);
-          statusDiv.textContent = `Codice scannerizzato: ${code} (non corrisponde)`;
-        }
-      }
-      scannerInput.value = '';
+  // Evento quando si inserisce/scansiona il codice nel secondo input
+  scanInput.addEventListener('input', () => {
+    const last4 = last4Input.value.trim();
+    const code = scanInput.value.trim().toUpperCase();
+
+    if (!isValidTracking(code)) {
+      // Formato errato
+      updateResult('yellow');
+      return;
+    }
+
+    // Prendiamo le ultime 4 cifre numeriche del codice
+    const codeLast4 = code.slice(-4);
+
+    if (last4.length !== 4 || !/^\d{4}$/.test(last4)) {
+      // Se il primo input non è valido, reset sfondo a nero
+      body.style.backgroundColor = 'black';
+      return;
+    }
+
+    if (codeLast4 === last4) {
+      // Match
+      updateResult('green');
+    } else {
+      // No match
+      updateResult('red');
     }
   });
 
-  // Per far partire scanner input sempre in focus
-  document.body.addEventListener('click', () => {
-    if (listConfirmed) scannerInput.focus();
+  // Quando si modifica il primo input, resetta lo sfondo e il secondo input
+  last4Input.addEventListener('input', () => {
+    body.style.backgroundColor = 'black';
+    scanInput.value = '';
+    scanInput.focus();
   });
 </script>
-
 </body>
 </html>
