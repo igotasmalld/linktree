@@ -31,6 +31,8 @@
     border-radius: 5px;
     border: none;
     outline: none;
+    background-color: #222;
+    color: white;
   }
   input:focus {
     outline: 2px solid white;
@@ -52,74 +54,75 @@
 <body>
   <div class="container">
     <label for="last4">Inserisci ultime 4 cifre tracking ID:</label>
-    <input type="text" id="last4" maxlength="4" pattern="\d{4}" inputmode="numeric" placeholder="Esempio: 7890" />
+    <input type="text" id="last4" maxlength="4" pattern="\d{4}" inputmode="numeric" placeholder="Esempio: 7890" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" />
 
     <label for="scan">Scannerizza o inserisci il codice completo:</label>
-    <input type="text" id="scan" maxlength="12" placeholder="Formato: BA1234567890" autocomplete="off" autocorrect="off" autocapitalize="characters" />
-
+    <input type="text" id="scan" maxlength="12" placeholder="Formato: BA1234567890" autocomplete="off" autocorrect="off" autocapitalize="characters" spellcheck="false" />
   </div>
 
 <script>
-  // Funzione per riprodurre un beep breve
   function playBeep() {
     const ctx = new (window.AudioContext || window.webkitAudioContext)();
     const oscillator = ctx.createOscillator();
     oscillator.type = 'square';
-    oscillator.frequency.setValueAtTime(440, ctx.currentTime); // La4
+    oscillator.frequency.setValueAtTime(440, ctx.currentTime);
     oscillator.connect(ctx.destination);
     oscillator.start();
-    oscillator.stop(ctx.currentTime + 0.15); // 150ms beep
+    oscillator.stop(ctx.currentTime + 0.15);
   }
 
   const last4Input = document.getElementById('last4');
   const scanInput = document.getElementById('scan');
   const body = document.body;
 
-  // Funzione per validare il formato BA + 10 numeri
   function isValidTracking(code) {
     return /^BA\d{10}$/.test(code);
   }
 
-  // Funzione per aggiornare lo sfondo e suonare beep
   function updateResult(color) {
     body.style.backgroundColor = color;
     playBeep();
   }
 
-  // Evento quando si inserisce/scansiona il codice nel secondo input
   scanInput.addEventListener('input', () => {
     const last4 = last4Input.value.trim();
     const code = scanInput.value.trim().toUpperCase();
 
+    if (code.length < 12) {
+      // Aspetta che venga completato il codice scannerizzato (12 caratteri)
+      return;
+    }
+
     if (!isValidTracking(code)) {
-      // Formato errato
       updateResult('yellow');
-      return;
-    }
-
-    // Prendiamo le ultime 4 cifre numeriche del codice
-    const codeLast4 = code.slice(-4);
-
-    if (last4.length !== 4 || !/^\d{4}$/.test(last4)) {
-      // Se il primo input non è valido, reset sfondo a nero
+    } else if (last4.length !== 4 || !/^\d{4}$/.test(last4)) {
+      // Primo input non valido: sfondo nero, nessun beep
       body.style.backgroundColor = 'black';
-      return;
+    } else {
+      const codeLast4 = code.slice(-4);
+      if (codeLast4 === last4) {
+        updateResult('green');
+      } else {
+        updateResult('red');
+      }
     }
 
-    if (codeLast4 === last4) {
-      // Match
-      updateResult('green');
-    } else {
-      // No match
-      updateResult('red');
-    }
+    // Pulisci il campo scan e rimetti il focus per la prossima scansione
+    scanInput.value = '';
+    scanInput.focus();
   });
 
-  // Quando si modifica il primo input, resetta lo sfondo e il secondo input
   last4Input.addEventListener('input', () => {
+    // Permetti di inserire tutte e 4 le cifre senza spostare il focus
+    // Reset sfondo e campo scan
     body.style.backgroundColor = 'black';
     scanInput.value = '';
     scanInput.focus();
+  });
+
+  // Metti il focus sulla prima casella all'apertura
+  window.addEventListener('load', () => {
+    last4Input.focus();
   });
 </script>
 </body>
