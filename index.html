@@ -54,26 +54,46 @@
 <body>
   <div class="container">
     <label for="last4">Inserisci ultime 4 cifre tracking ID:</label>
-    <input type="text" id="last4" maxlength="4" pattern="\d{4}" inputmode="numeric" placeholder="Esempio: 7890" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" />
+    <input type="text" id="last4" maxlength="4" placeholder="Esempio: 7890" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" inputmode="numeric" />
 
     <label for="scan">Scannerizza o inserisci il codice completo:</label>
     <input type="text" id="scan" maxlength="12" placeholder="Formato: BA1234567890" autocomplete="off" autocorrect="off" autocapitalize="characters" spellcheck="false" />
   </div>
 
 <script>
-  function playBeep() {
-    const ctx = new (window.AudioContext || window.webkitAudioContext)();
-    const oscillator = ctx.createOscillator();
-    oscillator.type = 'square';
-    oscillator.frequency.setValueAtTime(440, ctx.currentTime);
-    oscillator.connect(ctx.destination);
-    oscillator.start();
-    oscillator.stop(ctx.currentTime + 0.15);
-  }
-
   const last4Input = document.getElementById('last4');
   const scanInput = document.getElementById('scan');
   const body = document.body;
+
+  // Suoni distinti per i tre casi
+  function beepGreen() {
+    // Beep breve e acuto
+    playBeep(1046, 150, 'square');
+  }
+  function beepRed() {
+    // Beep più lungo e grave
+    playBeep(220, 350, 'sine');
+  }
+  function beepYellow() {
+    // Due beep veloci diversi
+    playBeep(523, 80, 'triangle', () => {
+      setTimeout(() => playBeep(784, 80, 'triangle'), 90);
+    });
+  }
+  // Funzione generica beep
+  function playBeep(freq = 440, duration = 150, type = 'square', onEnded = null) {
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    const oscillator = ctx.createOscillator();
+    oscillator.type = type;
+    oscillator.frequency.setValueAtTime(freq, ctx.currentTime);
+    oscillator.connect(ctx.destination);
+    oscillator.start();
+    oscillator.stop(ctx.currentTime + duration / 1000);
+    oscillator.onended = () => {
+      if (onEnded) onEnded();
+      ctx.close();
+    };
+  }
 
   function isValidTracking(code) {
     return /^BA\d{10}$/.test(code);
@@ -81,22 +101,43 @@
 
   function updateResult(color) {
     body.style.backgroundColor = color;
-    playBeep();
+    switch(color) {
+      case 'green': beepGreen(); break;
+      case 'red': beepRed(); break;
+      case 'yellow': beepYellow(); break;
+      default: break;
+    }
   }
+
+  // Impedisci che il focus cambi nella prima casella con invio/enter
+  last4Input.addEventListener('keydown', (e) => {
+    if (e.key === "Enter" || e.key === "Tab") {
+      e.preventDefault();
+      // Rimani nel campo
+      last4Input.focus();
+    }
+  });
+
+  // Permetti solo numeri nella prima casella
+  last4Input.addEventListener('input', () => {
+    last4Input.value = last4Input.value.replace(/\D/g, '').slice(0,4);
+    body.style.backgroundColor = 'black';
+    scanInput.value = '';
+    scanInput.focus();
+  });
 
   scanInput.addEventListener('input', () => {
     const last4 = last4Input.value.trim();
     const code = scanInput.value.trim().toUpperCase();
 
     if (code.length < 12) {
-      // Aspetta che venga completato il codice scannerizzato (12 caratteri)
+      // Aspetta codice completo
       return;
     }
 
     if (!isValidTracking(code)) {
       updateResult('yellow');
-    } else if (last4.length !== 4 || !/^\d{4}$/.test(last4)) {
-      // Primo input non valido: sfondo nero, nessun beep
+    } else if (last4.length !== 4) {
       body.style.backgroundColor = 'black';
     } else {
       const codeLast4 = code.slice(-4);
@@ -106,21 +147,11 @@
         updateResult('red');
       }
     }
-
-    // Pulisci il campo scan e rimetti il focus per la prossima scansione
+    // Pulisci e rimetti focus per scansione continua
     scanInput.value = '';
     scanInput.focus();
   });
 
-  last4Input.addEventListener('input', () => {
-    // Permetti di inserire tutte e 4 le cifre senza spostare il focus
-    // Reset sfondo e campo scan
-    body.style.backgroundColor = 'black';
-    scanInput.value = '';
-    scanInput.focus();
-  });
-
-  // Metti il focus sulla prima casella all'apertura
   window.addEventListener('load', () => {
     last4Input.focus();
   });
