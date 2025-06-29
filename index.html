@@ -3,104 +3,86 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Package Finder</title>
+  <title>Package Scanner</title>
   <style>
     body {
-      background-color: black;
-      color: white;
-      font-family: sans-serif;
+      font-family: Arial, sans-serif;
       text-align: center;
-      padding-top: 50px;
+      padding: 40px;
     }
-    .hidden {
+    #authSection, #scannerSection {
       display: none;
     }
-    .input-field {
-      margin: 10px;
-      padding: 10px;
-      font-size: 1.2rem;
+    .status {
+      font-size: 2em;
+      margin-top: 20px;
+      padding: 20px;
+      border-radius: 10px;
+      display: inline-block;
     }
-    .btn {
-      padding: 10px 20px;
-      font-size: 1.2rem;
-      background-color: yellow;
-      border: none;
-      cursor: pointer;
-    }
-    .screen-yellow {
-      background-color: yellow;
-      color: black;
-    }
-    .screen-red {
-      background-color: red;
-    }
-    .screen-green {
-      background-color: green;
-    }
+    .green { background-color: #c8f7c5; color: green; }
+    .red { background-color: #f7c5c5; color: red; }
+    .yellow { background-color: #fffac8; color: orange; }
   </style>
 </head>
 <body>
-  <div id="auth-screen">
-    <h1>Enter Password</h1>
-    <input type="password" id="password" class="input-field" />
-    <button class="btn" onclick="checkPassword()">Enter</button>
+  <h1>Package Scanner</h1>
+
+  <div id="authSection">
+    <input type="password" id="passwordInput" placeholder="Enter password" />
+    <button onclick="checkPassword()">Login</button>
+    <p id="authMessage"></p>
   </div>
 
-  <div id="code1-screen" class="hidden">
-    <h1>Enter Code 1</h1>
-    <input type="text" id="code1" class="input-field" maxlength="12" />
-    <button class="btn" onclick="nextStep()">OK</button>
+  <div id="scannerSection">
+    <input type="text" id="targetInput" placeholder="Target Tracking ID (e.g. BA1234567890)" />
+    <br /><br />
+    <input type="text" id="scanInput" placeholder="Scan package here" oninput="checkTrackingID()" autofocus />
+    <div id="status" class="status"></div>
   </div>
 
-  <div id="code2-screen" class="hidden">
-    <h1>Enter Code 2</h1>
-    <input type="text" id="code2" class="input-field" maxlength="12" oninput="checkCode2()" />
-  </div>
-
-  <audio id="sound-yellow" src="https://www.soundjay.com/buttons/sounds/button-10.mp3"></audio>
-  <audio id="sound-red" src="https://www.soundjay.com/button/sounds/button-3.mp3"></audio>
-  <audio id="sound-green" src="https://www.soundjay.com/human/sounds/applause-8.mp3"></audio>
+  <audio id="clapSound" src="https://www.soundjay.com/human/applause-8.mp3"></audio>
+  <audio id="booSound" src="https://www.soundjay.com/human/boo-01.mp3"></audio>
+  <audio id="alertSound" src="https://www.soundjay.com/button/button-3.mp3"></audio>
 
   <script>
+    const correctPassword = "bugha";
+
+    window.onload = () => {
+      document.getElementById("authSection").style.display = "block";
+    };
+
     function checkPassword() {
-      const pass = document.getElementById("password").value;
-      if (pass === "bugha") {
-        document.getElementById("auth-screen").classList.add("hidden");
-        document.getElementById("code1-screen").classList.remove("hidden");
-      }
-    }
-
-    let storedCode1 = "";
-
-    function nextStep() {
-      storedCode1 = document.getElementById("code1").value.trim();
-      if (/^BA\d{10}$/.test(storedCode1)) {
-        document.getElementById("code1-screen").classList.add("hidden");
-        document.getElementById("code2-screen").classList.remove("hidden");
+      const input = document.getElementById("passwordInput").value;
+      if (input === correctPassword) {
+        document.getElementById("authSection").style.display = "none";
+        document.getElementById("scannerSection").style.display = "block";
+        document.getElementById("targetInput").focus();
       } else {
-        alert("Code 1 format is invalid. Format: BA followed by 10 digits.");
+        document.getElementById("authMessage").innerText = "Incorrect password";
       }
     }
 
-    function checkCode2() {
-      const code2 = document.getElementById("code2").value.trim();
-      const body = document.body;
-      const yellowSound = document.getElementById("sound-yellow");
-      const redSound = document.getElementById("sound-red");
-      const greenSound = document.getElementById("sound-green");
+    function checkTrackingID() {
+      const target = document.getElementById("targetInput").value.trim().toUpperCase();
+      const scanned = document.getElementById("scanInput").value.trim().toUpperCase();
+      const status = document.getElementById("status");
 
-      if (code2.length === 12) {
-        if (!/^BA\d{10}$/.test(code2)) {
-          body.className = "screen-yellow";
-          yellowSound.play();
-        } else if (code2 !== storedCode1) {
-          body.className = "screen-red";
-          redSound.play();
-        } else {
-          body.className = "screen-green";
-          greenSound.play();
-        }
+      if (!/^BA\d{10}$/.test(scanned)) {
+        status.textContent = "Invalid Format";
+        status.className = "status yellow";
+        document.getElementById("alertSound").play();
+      } else if (scanned === target) {
+        status.textContent = "Match Found!";
+        status.className = "status green";
+        document.getElementById("clapSound").play();
+      } else {
+        status.textContent = "Not a Match";
+        status.className = "status red";
+        document.getElementById("booSound").play();
       }
+
+      document.getElementById("scanInput").value = "";
     }
   </script>
 </body>
