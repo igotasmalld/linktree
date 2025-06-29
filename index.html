@@ -6,9 +6,35 @@
   <title>Package Scanner</title>
   <style>
     body {
-      font-family: Arial, sans-serif;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       text-align: center;
       padding: 40px;
+      background: #f4f6f9;
+    }
+    h1 {
+      font-size: 2.5em;
+      margin-bottom: 20px;
+      color: #333;
+    }
+    input[type="password"], input[type="text"] {
+      padding: 12px;
+      width: 300px;
+      font-size: 1em;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      margin-bottom: 10px;
+    }
+    button {
+      padding: 12px 20px;
+      font-size: 1em;
+      border: none;
+      border-radius: 8px;
+      background-color: #007bff;
+      color: white;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #0056b3;
     }
     #authSection, #scannerSection {
       display: none;
@@ -19,19 +45,21 @@
       padding: 20px;
       border-radius: 10px;
       display: inline-block;
+      min-width: 250px;
     }
-    .green { background-color: #c8f7c5; color: green; }
-    .red { background-color: #f7c5c5; color: red; }
-    .yellow { background-color: #fffac8; color: orange; }
+    .green { background-color: #d4edda; color: #155724; }
+    .red { background-color: #f8d7da; color: #721c24; }
+    .yellow { background-color: #fff3cd; color: #856404; }
   </style>
 </head>
 <body>
-  <h1>Package Scanner</h1>
+  <h1>📦 Package Scanner</h1>
 
   <div id="authSection">
     <input type="password" id="passwordInput" placeholder="Enter password" />
+    <br />
     <button onclick="checkPassword()">Login</button>
-    <p id="authMessage"></p>
+    <p id="authMessage" style="color:red;"></p>
   </div>
 
   <div id="scannerSection">
@@ -41,9 +69,9 @@
     <div id="status" class="status"></div>
   </div>
 
-  <audio id="clapSound" src="https://www.soundjay.com/human/applause-8.mp3"></audio>
-  <audio id="booSound" src="https://www.soundjay.com/human/boo-01.mp3"></audio>
-  <audio id="alertSound" src="https://www.soundjay.com/button/button-3.mp3"></audio>
+  <audio id="clapSound" src="https://www.soundjay.com/human/applause-8.mp3" preload="auto"></audio>
+  <audio id="booSound" src="https://www.soundjay.com/human/boo-01.mp3" preload="auto"></audio>
+  <audio id="alertSound" src="https://www.soundjay.com/button/button-3.mp3" preload="auto"></audio>
 
   <script>
     const correctPassword = "bugha";
@@ -63,6 +91,12 @@
       }
     }
 
+    function playSound(soundId) {
+      const sound = document.getElementById(soundId);
+      sound.currentTime = 0;
+      sound.play();
+    }
+
     function checkTrackingID() {
       const target = document.getElementById("targetInput").value.trim().toUpperCase();
       const scanned = document.getElementById("scanInput").value.trim().toUpperCase();
@@ -71,15 +105,15 @@
       if (!/^BA\d{10}$/.test(scanned)) {
         status.textContent = "Invalid Format";
         status.className = "status yellow";
-        document.getElementById("alertSound").play();
+        playSound("alertSound");
       } else if (scanned === target) {
-        status.textContent = "Match Found!";
+        status.textContent = "✅ Match Found!";
         status.className = "status green";
-        document.getElementById("clapSound").play();
+        playSound("clapSound");
       } else {
-        status.textContent = "Not a Match";
+        status.textContent = "❌ Not a Match";
         status.className = "status red";
-        document.getElementById("booSound").play();
+        playSound("booSound");
       }
 
       document.getElementById("scanInput").value = "";
