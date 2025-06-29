@@ -3,160 +3,176 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Tracking ID Finder</title>
+<title>Scanner Tracking ID</title>
 <style>
   body {
-    margin: 0; padding: 0;
+    margin: 0;
+    font-family: Arial, sans-serif;
     background-color: black;
     color: white;
-    font-family: Arial, sans-serif;
     display: flex;
     flex-direction: column;
     height: 100vh;
     justify-content: center;
     align-items: center;
     text-align: center;
+    user-select: none;
   }
-  #container {
-    width: 90vw;
+  #login, #main {
+    width: 90%;
     max-width: 400px;
   }
-  input, button {
-    font-size: 1.2rem;
-    padding: 0.5em;
-    margin: 0.5em 0;
+  input[type="password"], input[type="text"] {
     width: 100%;
-    border-radius: 5px;
+    padding: 12px;
+    margin: 10px 0 20px;
+    font-size: 1.2rem;
     border: none;
-  }
-  input {
-    background: #222;
-    color: white;
+    border-radius: 6px;
   }
   button {
-    background: #444;
+    width: 100%;
+    padding: 14px;
+    font-size: 1.3rem;
+    background-color: #444;
+    border: none;
+    border-radius: 6px;
     color: white;
     cursor: pointer;
+    user-select: none;
   }
-  button:disabled {
-    background: #666;
-    cursor: not-allowed;
+  button:active {
+    background-color: #666;
   }
-  #statusText {
-    margin-top: 1em;
+  #status {
+    margin-top: 30px;
     font-size: 1.5rem;
-    height: 2em;
+    min-height: 2em;
   }
 </style>
 </head>
 <body>
-<div id="container">
-  <h1>Tracking ID Finder</h1>
 
-  <div id="loginDiv">
-    <input type="password" id="passwordInput" placeholder="Inserisci password" />
-    <button id="loginBtn">Entra</button>
-    <p id="loginMsg" style="color: red; height:1.2em;"></p>
-  </div>
-
-  <div id="appDiv" style="display:none;">
-    <label for="partialIdInput">Inserisci ultime 4 o 5 cifre del tracking ID da cercare:</label>
-    <input type="text" id="partialIdInput" maxlength="5" pattern="\d{4,5}" placeholder="Es: 1234 o 12345" />
-    <button id="confirmListBtn" disabled>Conferma lista completa</button>
-
-    <div id="scannerDiv" style="margin-top:2em; display:none;">
-      <label for="scanInput">Scannerizza il pacco (inserisci codice):</label>
-      <input type="text" id="scanInput" placeholder="Es: BA1234567890" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
-      <div id="statusText"></div>
-    </div>
-  </div>
+<div id="login">
+  <h1>Accesso</h1>
+  <input id="passwordInput" type="password" placeholder="Inserisci password" autocomplete="off" />
+  <button id="loginBtn">Accedi</button>
+  <p id="loginError" style="color: #f44; display:none;">Password errata</p>
 </div>
 
+<div id="main" style="display:none;">
+  <h1>Ricerca Tracking ID</h1>
+  <p>Inserisci ultime 4 o 5 cifre del tracking ID (es. 1234 o 12345)</p>
+  <input id="partialId" type="text" maxlength="5" pattern="\d{4,5}" placeholder="Ultime 4 o 5 cifre" autocomplete="off" />
+  <button id="confirmListBtn">Conferma Lista</button>
+
+  <div id="scannerArea" style="display:none; margin-top: 20px;">
+    <p>Scannerizza i codici ora...</p>
+    <input id="scannerInput" type="text" autocomplete="off" autofocus style="opacity:0; position:absolute; pointer-events:none;" />
+  </div>
+
+  <div id="status"></div>
+</div>
+
+<audio id="clapSound" src="https://actions.google.com/sounds/v1/applause/applause_01.wav" preload="auto"></audio>
+<audio id="beepSound" src="https://actions.google.com/sounds/v1/cartoon/wood_plank_flicks.ogg" preload="auto"></audio>
+<audio id="alertSound" src="https://actions.google.com/sounds/v1/alarms/beep_short.ogg" preload="auto"></audio>
+
 <script>
-  // Hardcoded password (modifica qui)
-  const PASSWORD = "1234";
+  const PASSWORD = "1234"; // cambia password qui
+  const loginDiv = document.getElementById('login');
+  const mainDiv = document.getElementById('main');
+  const loginBtn = document.getElementById('loginBtn');
+  const passwordInput = document.getElementById('passwordInput');
+  const loginError = document.getElementById('loginError');
 
-  const loginDiv = document.getElementById("loginDiv");
-  const appDiv = document.getElementById("appDiv");
-  const loginBtn = document.getElementById("loginBtn");
-  const passwordInput = document.getElementById("passwordInput");
-  const loginMsg = document.getElementById("loginMsg");
+  const partialIdInput = document.getElementById('partialId');
+  const confirmListBtn = document.getElementById('confirmListBtn');
+  const scannerArea = document.getElementById('scannerArea');
+  const scannerInput = document.getElementById('scannerInput');
+  const statusDiv = document.getElementById('status');
 
-  const partialIdInput = document.getElementById("partialIdInput");
-  const confirmListBtn = document.getElementById("confirmListBtn");
-  const scannerDiv = document.getElementById("scannerDiv");
-  const scanInput = document.getElementById("scanInput");
-  const statusText = document.getElementById("statusText");
+  const clapSound = document.getElementById('clapSound');
+  const beepSound = document.getElementById('beepSound');
+  const alertSound = document.getElementById('alertSound');
 
-  // Suoni
-  const audioCorrect = new Audio("https://actions.google.com/sounds/v1/human_voices/applause.ogg");
-  const audioWrong = new Audio("https://actions.google.com/sounds/v1/cartoon/clang_and_wobble.ogg");
-  const audioFormat = new Audio("https://actions.google.com/sounds/v1/alarms/beep_short.ogg");
-
-  // Stato
   let partialId = "";
-  let confirmed = false;
+  let listConfirmed = false;
 
   // Login
-  loginBtn.addEventListener("click", () => {
+  loginBtn.addEventListener('click', () => {
     if (passwordInput.value === PASSWORD) {
-      loginDiv.style.display = "none";
-      appDiv.style.display = "block";
+      loginError.style.display = 'none';
+      loginDiv.style.display = 'none';
+      mainDiv.style.display = 'block';
+      partialIdInput.focus();
     } else {
-      loginMsg.textContent = "Password errata";
+      loginError.style.display = 'block';
     }
   });
 
-  // Abilita bottone conferma solo se input valido (4 o 5 cifre numeriche)
-  partialIdInput.addEventListener("input", () => {
+  // Conferma lista
+  confirmListBtn.addEventListener('click', () => {
     const val = partialIdInput.value.trim();
-    confirmListBtn.disabled = !(val.length >= 4 && val.length <= 5 && /^\d{4,5}$/.test(val));
-  });
-
-  confirmListBtn.addEventListener("click", () => {
-    partialId = partialIdInput.value.trim();
-    confirmed = true;
-    partialIdInput.disabled = true;
+    if (!/^\d{4,5}$/.test(val)) {
+      alert('Inserisci 4 o 5 cifre numeriche!');
+      partialIdInput.focus();
+      return;
+    }
+    partialId = val;
+    listConfirmed = true;
     confirmListBtn.disabled = true;
-    scannerDiv.style.display = "block";
-    scanInput.focus();
+    partialIdInput.disabled = true;
+    scannerArea.style.display = 'block';
+    statusDiv.textContent = "In attesa di scannerizzazione...";
+    scannerInput.focus();
   });
 
-  // Funzione per controllare formato BA + 10 numeri
+  // Funzione controllo formato tracking id
   function isValidFormat(code) {
     return /^BA\d{10}$/.test(code);
   }
 
-  scanInput.addEventListener("keydown", (e) => {
-    if (e.key === "Enter") {
-      const code = scanInput.value.trim().toUpperCase();
-      scanInput.value = "";
+  // Funzione per suonare e cambiare colore sfondo
+  function showFeedback(color, sound) {
+    document.body.style.backgroundColor = color;
+    sound.currentTime = 0;
+    sound.play();
+    setTimeout(() => {
+      document.body.style.backgroundColor = 'black';
+    }, 1200);
+  }
 
+  // Gestione scanner input
+  scannerInput.addEventListener('input', () => {
+    let code = scannerInput.value.trim().toUpperCase();
+    if (code.length === 12) {
+      // Controlla formato
       if (!isValidFormat(code)) {
         // Formato errato
-        document.body.style.backgroundColor = "yellow";
-        statusText.textContent = "Formato codice errato!";
-        audioFormat.play();
-      } else if (code.endsWith(partialId)) {
-        // Codice corretto (match ultime cifre)
-        document.body.style.backgroundColor = "green";
-        statusText.textContent = "Pacco trovato!";
-        audioCorrect.play();
+        showFeedback('yellow', alertSound);
+        statusDiv.textContent = `Codice non valido: ${code}`;
       } else {
-        // Codice formato giusto ma non match
-        document.body.style.backgroundColor = "red";
-        statusText.textContent = "Pacco non corretto!";
-        audioWrong.play();
+        // Formato corretto
+        if (code.endsWith(partialId)) {
+          // Trovato!
+          showFeedback('green', clapSound);
+          statusDiv.textContent = `PACCO TROVATO! Codice: ${code}`;
+        } else {
+          // Non è il pacco giusto
+          showFeedback('red', beepSound);
+          statusDiv.textContent = `Codice scannerizzato: ${code} (non corrisponde)`;
+        }
       }
-
-      // Dopo 2 secondi torna nero
-      setTimeout(() => {
-        document.body.style.backgroundColor = "black";
-        statusText.textContent = "";
-      }, 2000);
+      scannerInput.value = '';
     }
   });
 
+  // Per far partire scanner input sempre in focus
+  document.body.addEventListener('click', () => {
+    if (listConfirmed) scannerInput.focus();
+  });
 </script>
+
 </body>
 </html>
