@@ -1,120 +1,76 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Verifica Tracking ID</title>
-  <style>
-    html, body {
-      margin: 0;
-      padding: 0;
-      height: 100%;
-      background-color: black;
-      color: white;
-      font-family: Arial, sans-serif;
-      overflow: hidden;
-    }
-    #wrapper {
-      height: 100%;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      text-align: center;
-      padding: 20px;
-      box-sizing: border-box;
-    }
-    textarea, input {
-      font-size: 24px;
-      padding: 10px;
-      width: 90%;
-      max-width: 400px;
-      margin-bottom: 20px;
-      border-radius: 8px;
-      border: none;
-    }
-    button {
-      font-size: 24px;
-      padding: 10px 20px;
-      border: none;
-      border-radius: 8px;
-      background-color: white;
-      color: black;
-      cursor: pointer;
-    }
-    #status {
-      font-size: 32px;
-      margin-top: 20px;
-    }
-    .hidden {
-      display: none;
-    }
-  </style>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Tracking ID Finder</title>
+<style>
+  body {
+    margin: 0; padding: 0;
+    background-color: black;
+    color: white;
+    font-family: Arial, sans-serif;
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+  }
+  #container {
+    width: 90vw;
+    max-width: 400px;
+  }
+  input, button {
+    font-size: 1.2rem;
+    padding: 0.5em;
+    margin: 0.5em 0;
+    width: 100%;
+    border-radius: 5px;
+    border: none;
+  }
+  input {
+    background: #222;
+    color: white;
+  }
+  button {
+    background: #444;
+    color: white;
+    cursor: pointer;
+  }
+  button:disabled {
+    background: #666;
+    cursor: not-allowed;
+  }
+  #statusText {
+    margin-top: 1em;
+    font-size: 1.5rem;
+    height: 2em;
+  }
+</style>
 </head>
 <body>
-  <div id="wrapper">
-    <div id="step1">
-      <h1>Verifica Pacco</h1>
-      <p>Inserisci le ultime 4 o 5 cifre dei tracking ID (uno per riga):</p>
-      <textarea id="idsInput" rows="10" placeholder="Es: 1234\n56789"></textarea><br>
-      <button onclick="confermaLista()">Conferma Lista</button>
-    </div>
-    <div id="step2" class="hidden">
-      <h1>Scannerizza i pacchi</h1>
-      <input type="text" id="scannerInput" autofocus placeholder="Scansiona qui" oninput="verificaCodice(this.value)">
-      <div id="status"></div>
-    </div>
+<div id="container">
+  <h1>Tracking ID Finder</h1>
+
+  <div id="loginDiv">
+    <input type="password" id="passwordInput" placeholder="Inserisci password" />
+    <button id="loginBtn">Entra</button>
+    <p id="loginMsg" style="color: red; height:1.2em;"></p>
   </div>
 
-  <audio id="suonoVerde" src="https://www.myinstants.com/media/sounds/applause.mp3"></audio>
-  <audio id="suonoRosso" src="https://www.myinstants.com/media/sounds/incorrect.mp3"></audio>
-  <audio id="suonoGiallo" src="https://www.myinstants.com/media/sounds/bell.mp3"></audio>
+  <div id="appDiv" style="display:none;">
+    <label for="partialIdInput">Inserisci ultime 4 o 5 cifre del tracking ID da cercare:</label>
+    <input type="text" id="partialIdInput" maxlength="5" pattern="\d{4,5}" placeholder="Es: 1234 o 12345" />
+    <button id="confirmListBtn" disabled>Conferma lista completa</button>
 
-  <script>
-    let ultimiCifre = [];
+    <div id="scannerDiv" style="margin-top:2em; display:none;">
+      <label for="scanInput">Scannerizza il pacco (inserisci codice):</label>
+      <input type="text" id="scanInput" placeholder="Es: BA1234567890" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <div id="statusText"></div>
+    </div>
+  </div>
+</div>
 
-    function cambiaColore(colore) {
-      document.body.style.backgroundColor = colore;
-      setTimeout(() => {
-        document.body.style.backgroundColor = 'black';
-      }, 800);
-    }
-
-    function confermaLista() {
-      const rawInput = document.getElementById('idsInput').value.trim().split("\n");
-      ultimiCifre = rawInput.map(r => r.trim()).filter(r => r.length >= 4);
-      document.getElementById('step1').classList.add('hidden');
-      document.getElementById('step2').classList.remove('hidden');
-      document.getElementById('scannerInput').focus();
-    }
-
-    function verificaCodice(valore) {
-      if (valore.length < 12) return;
-
-      const input = document.getElementById('scannerInput');
-      const status = document.getElementById('status');
-
-      const formatoValido = /^BA\d{10}$/;
-      if (!formatoValido.test(valore)) {
-        cambiaColore('yellow');
-        status.textContent = '⚠️ Formato non valido';
-        document.getElementById('suonoGiallo').play();
-      } else {
-        const ultime = valore.slice(-5);
-        const ultime4 = valore.slice(-4);
-        if (ultimiCifre.includes(ultime) || ultimiCifre.includes(ultime4)) {
-          cambiaColore('green');
-          status.textContent = '✅ Pacco trovato!';
-          document.getElementById('suonoVerde').play();
-        } else {
-          cambiaColore('red');
-          status.textContent = '❌ Non è il pacco giusto';
-          document.getElementById('suonoRosso').play();
-        }
-      }
-      input.value = '';
-      input.focus();
-    }
-  </script>
-</body>
-</html>
+<script>
+  // Hardcoded passwo
