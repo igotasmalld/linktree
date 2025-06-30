@@ -1,122 +1,78 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Ricerca Pacchi con Feedback</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      margin: 2rem;
-      max-width: 400px;
-    }
-    label {
-      font-weight: bold;
-      display: block;
-      margin-top: 1rem;
-    }
-    input {
-      width: 100%;
-      font-size: 1.2rem;
-      padding: 0.5rem;
-      margin-top: 0.3rem;
-      box-sizing: border-box;
-    }
-    #result {
-      margin-top: 1.5rem;
-      font-size: 1.3rem;
-      font-weight: bold;
-    }
-    #result.match {
-      color: green;
-    }
-    #result.nomatch {
-      color: red;
-    }
-  </style>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Scanner Pacchi - Scanner Integrato</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    transition: background-color 0.5s ease;
+  }
+  label {
+    display: block;
+    margin-top: 1em;
+  }
+  input {
+    width: 100%;
+    font-size: 1.2em;
+    padding: 0.5em;
+  }
+  #scanned {
+    background-color: #eee;
+  }
+</style>
 </head>
 <body>
-  <h1>Ricerca Pacchi</h1>
 
-  <label for="targetInput">Inserisci ultime 4-5 cifre del tracking ID da cercare:</label>
-  <input type="text" id="targetInput" maxlength="5" placeholder="es. 12345" autocomplete="off" />
+<h1>Ricerca Pacchi con Scanner Integrato</h1>
 
-  <label for="scanInput">Scannerizza il codice del pacco:</label>
-  <input type="text" id="scanInput" autocomplete="off" autofocus />
+<label for="inducted">Inducted (ultime 4 cifre tracking ID, separate da virgola):</label>
+<input type="text" id="inducted" placeholder="Es: 1234,5678,9012" />
 
-  <div id="result"></div>
+<label for="scanned">Scanned (codice scannerizzato):</label>
+<input type="text" id="scanned" autocomplete="off" autofocus />
 
-  <!-- Suono di conferma -->
-  <audio id="beepSound" src="https://actions.google.com/sounds/v1/cartoon/clang_and_wobble.ogg" preload="auto"></audio>
+<script>
+  const inductedInput = document.getElementById('inducted');
+  const scannedInput = document.getElementById('scanned');
 
-  <script>
-    const targetInput = document.getElementById('targetInput');
-    const scanInput = document.getElementById('scanInput');
-    const resultDiv = document.getElementById('result');
-    const beepSound = document.getElementById('beepSound');
+  // Funzione per vibrare dispositivo (se supportato)
+  function vibrateDevice() {
+    if (navigator.vibrate) {
+      navigator.vibrate(200);
+    }
+  }
 
-    let scanBuffer = "";
-    let scanTimeout;
+  // Funzione per controllare se codice scannerizzato è nella lista
+  function checkCode(code) {
+    const last4 = code.slice(-4);
+    const inductedList = inductedInput.value.split(',').map(s => s.trim());
+    return inductedList.includes(last4);
+  }
 
-    // Funzione per attivare vibrazione (se supportata)
-    function vibratePattern() {
-      if (navigator.vibrate) {
-        navigator.vibrate([200, 100, 200]);
-      }
+  // Gestione evento input nel campo scanned
+  scannedInput.addEventListener('change', () => {
+    const code = scannedInput.value.trim();
+    if (code.length === 0) return;
+
+    if (checkCode(code)) {
+      document.body.style.backgroundColor = 'lightgreen';
+      vibrateDevice();
+    } else {
+      document.body.style.backgroundColor = '';
     }
 
-    // Funzione di confronto e feedback
-    function checkMatch(scannedCode) {
-      const target = targetInput.value.trim();
-      if (target.length < 4 || target.length > 5) {
-        resultDiv.textContent = "Inserisci 4 o 5 cifre nel campo superiore.";
-        resultDiv.className = "nomatch";
-        return;
-      }
+    // Pulisce il campo per la prossima scansione
+    scannedInput.value = '';
+    scannedInput.focus();
+  });
 
-      if (scannedCode.endsWith(target)) {
-        resultDiv.textContent = "PACCO TROVATO! ✅";
-        resultDiv.className = "match";
-        beepSound.play();
-        vibratePattern();
-      } else {
-        resultDiv.textContent = "Pacco NON corrispondente.";
-        resultDiv.className = "nomatch";
-      }
-    }
+  // Mantieni il focus sul campo scanned per ricevere input dallo scanner
+  window.onload = () => {
+    scannedInput.focus();
+  };
+</script>
 
-    // Gestione input scanner senza invio automatico
-    scanInput.addEventListener('keypress', (e) => {
-      // Accumula i caratteri ricevuti
-      scanBuffer += e.key;
-
-      // Reset del timeout a ogni tasto premuto
-      clearTimeout(scanTimeout);
-
-      // Dopo 100ms di pausa consideriamo la scansione finita
-      scanTimeout = setTimeout(() => {
-        if (scanBuffer.length > 0) {
-          checkMatch(scanBuffer.trim());
-          scanBuffer = "";
-          scanInput.value = "";
-        }
-      }, 100);
-    });
-
-    // Mantieni sempre il focus sul campo di scansione
-    scanInput.focus();
-
-    // Optional: se vuoi, puoi anche gestire il tasto Enter normalmente
-    scanInput.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter') {
-        e.preventDefault(); // evita invio form o altro
-        if (scanBuffer.length > 0) {
-          checkMatch(scanBuffer.trim());
-          scanBuffer = "";
-          scanInput.value = "";
-        }
-      }
-    });
-  </script>
 </body>
 </html>
