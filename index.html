@@ -2,140 +2,75 @@
 <html lang="it">
 <head>
 <meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
-<title>Scanner Pacchi - Funzionante con Scanner Integrato</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Ricerca Pacchi</title>
 <style>
   body {
     font-family: Arial, sans-serif;
-    transition: background-color 0.5s ease;
-    margin: 1em;
-    background-color: #fff;
-    color: #000;
+    padding: 20px;
+    transition: background-color 0.3s ease;
   }
   label {
     display: block;
-    margin-top: 1em;
-    font-size: 1.1em;
-  }
-  input {
-    width: 100%;
-    font-size: 1.2em;
-    padding: 0.8em;
-    margin-top: 0.3em;
-    box-sizing: border-box;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-  }
-  input:focus {
-    border-color: #007BFF;
-    outline: none;
-  }
-  #scanned {
-    background-color: #eee;
-  }
-  #counter {
-    margin-top: 1em;
-    font-size: 1.3em;
+    margin-top: 15px;
     font-weight: bold;
+  }
+  input[type="text"] {
+    width: 100%;
+    padding: 8px;
+    font-size: 1em;
+    margin-top: 5px;
+    box-sizing: border-box;
   }
 </style>
 </head>
 <body>
 
-<h1>Ricerca Pacchi con Scanner Integrato</h1>
+<h1>Ricerca Pacchi</h1>
 
-<label for="inducted">Inducted (ultime 4 cifre tracking ID, separate da virgola):</label>
-<input type="text" id="inducted" placeholder="Es: 1234,5678,9012" inputmode="numeric" pattern="[0-9, ]*" />
+<label for="inducted">Inducted (ultime 4 cifre, separate da virgola)</label>
+<input type="text" id="inducted" placeholder="Es: 1234, 5678, 9012" />
 
-<label for="scanned">Scanned (codice scannerizzato):</label>
-<input type="text" id="scanned" autocomplete="off" readonly />
-
-<div id="counter">Pacchi scannerizzati: 0</div>
+<label for="scanned">Scanned (automatico)</label>
+<input type="text" id="scanned" readonly placeholder="Codice scannerizzato" />
 
 <script>
   const inductedInput = document.getElementById('inducted');
   const scannedInput = document.getElementById('scanned');
-  const counterDiv = document.getElementById('counter');
 
-  let scanBuffer = '';
-  let scanTimer;
-  let scanCount = 0;
-
-  // Funzione per vibrare dispositivo (se supportato)
-  function vibrateDevice() {
-    if (navigator.vibrate) navigator.vibrate(200);
-  }
-
-  // Aggiorna contatore a schermo
-  function updateCounter() {
-    counterDiv.textContent = `Pacchi scannerizzati: ${scanCount}`;
-  }
-
-  // Controlla se il codice è nella lista Inducted
-  function checkCode(code) {
-    const last4 = code.slice(-4);
-    const inductedList = inductedInput.value.split(',').map(s => s.trim());
-    return inductedList.includes(last4);
-  }
-
-  // Elabora la scansione completa
-  function processScan(code) {
-    scanCount++;
-    updateCounter();
-
+  // Funzione per simulare la scansione di un codice (per test)
+  function simulateScan(code) {
     scannedInput.value = code;
-    if (checkCode(code)) {
-      document.body.style.backgroundColor = 'lightgreen';
-      vibrateDevice();
-    } else {
-      document.body.style.backgroundColor = '';
-    }
-
-    // Dopo breve pausa, pulisce il campo e mantiene il focus
-    setTimeout(() => {
-      scannedInput.value = '';
-      scannedInput.focus();
-    }, 1000);
+    checkMatch(code);
   }
 
-  // Mantieni sempre il focus sul body per catturare i tasti
-  window.focus();
+  // Controlla se le ultime 4 cifre del codice scannerizzato sono in Inducted
+  function checkMatch(scannedCode) {
+    const inductedCodes = inductedInput.value
+      .split(',')
+      .map(s => s.trim())
+      .filter(s => s.length === 4);
 
-  // Listener globale per catturare i tasti dallo scanner
-  window.addEventListener('keydown', (e) => {
-    // Ignora tasti speciali (Shift, Ctrl, Alt, ecc.)
-    if (e.key.length === 1) {
-      scanBuffer += e.key;
-    }
-
-    // Se premuto Invio o Tab, considera la scansione finita
-    if (e.key === 'Enter' || e.key === 'Tab') {
-      e.preventDefault();
-      if (scanBuffer.length > 0) {
-        processScan(scanBuffer);
-        scanBuffer = '';
+    if (scannedCode.length >= 4) {
+      const last4 = scannedCode.slice(-4);
+      if (inductedCodes.includes(last4)) {
+        document.body.style.backgroundColor = 'lightgreen';
+        // Vibrate device if supported
+        if (navigator.vibrate) {
+          navigator.vibrate(500);
+        }
+        return;
       }
     }
+    // Se non corrisponde, resetta sfondo
+    document.body.style.backgroundColor = '';
+  }
 
-    // Timer per rilevare fine scansione dopo 300ms di inattività
-    clearTimeout(scanTimer);
-    scanTimer = setTimeout(() => {
-      if (scanBuffer.length > 0) {
-        processScan(scanBuffer);
-        scanBuffer = '';
-      }
-    }, 300);
-  });
+  // Simulazione scansione: sostituisci con codice reale di scansione
+  // Per test, puoi chiamare simulateScan('ABC12345678') nella console del browser
 
-  // Forza il focus sul body e sul campo scanned all’avvio
-  window.addEventListener('load', () => {
-    scannedInput.focus();
-  });
-
-  // Se il focus si perde, riportalo sul campo scanned
-  window.addEventListener('focus', () => {
-    scannedInput.focus();
-  });
+  // Esempio: dopo 2 secondi simula una scansione
+  setTimeout(() => simulateScan('XYZ12345678'), 2000);
 </script>
 
 </body>
