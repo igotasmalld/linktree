@@ -37,6 +37,9 @@
   const inductedInput = document.getElementById('inducted');
   const scannedInput = document.getElementById('scanned');
 
+  let scanBuffer = '';
+  let scanTimer;
+
   // Funzione per vibrare dispositivo (se supportato)
   function vibrateDevice() {
     if (navigator.vibrate) {
@@ -51,27 +54,51 @@
     return inductedList.includes(last4);
   }
 
-  // Gestione evento input nel campo scanned
-  scannedInput.addEventListener('change', () => {
-    const code = scannedInput.value.trim();
-    if (code.length === 0) return;
-
+  // Funzione per processare il codice scannerizzato
+  function processScan(code) {
+    scannedInput.value = code;
     if (checkCode(code)) {
       document.body.style.backgroundColor = 'lightgreen';
       vibrateDevice();
     } else {
       document.body.style.backgroundColor = '';
     }
-
     // Pulisce il campo per la prossima scansione
     scannedInput.value = '';
     scannedInput.focus();
+  }
+
+  // Mantieni il focus sul campo scanned
+  scannedInput.focus();
+
+  // Ascolta i tasti premuti per catturare la scansione
+  window.addEventListener('keydown', (e) => {
+    // Ignora tasti speciali come Shift, Ctrl, Alt, ecc.
+    if (e.key.length === 1) {
+      scanBuffer += e.key;
+    }
+    // Se premuto invio o tab, consideriamo la scansione finita
+    if (e.key === 'Enter' || e.key === 'Tab') {
+      e.preventDefault();
+      if (scanBuffer.length > 0) {
+        processScan(scanBuffer);
+        scanBuffer = '';
+      }
+    }
+    // Reset timer per fine scansione dopo 300ms di inattività
+    clearTimeout(scanTimer);
+    scanTimer = setTimeout(() => {
+      if (scanBuffer.length > 0) {
+        processScan(scanBuffer);
+        scanBuffer = '';
+      }
+    }, 300);
   });
 
-  // Mantieni il focus sul campo scanned per ricevere input dallo scanner
-  window.onload = () => {
+  // Se il focus si perde, lo riportiamo al campo scanned
+  window.addEventListener('focus', () => {
     scannedInput.focus();
-  };
+  });
 </script>
 
 </body>
