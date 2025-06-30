@@ -1,94 +1,104 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Ricerca Pacco per Ultime Cifre Tracking ID</title>
-<style>
-  body { font-family: Arial, sans-serif; padding: 20px; }
-  label { font-weight: bold; margin-top: 10px; display: block; }
-  input { font-size: 1.2em; padding: 5px; width: 300px; }
-  #status { margin-top: 20px; font-weight: bold; font-size: 1.3em; }
-</style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Ricerca Pacchi con Feedback</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 2rem;
+      max-width: 400px;
+    }
+    label {
+      font-weight: bold;
+      display: block;
+      margin-top: 1rem;
+    }
+    input {
+      width: 100%;
+      font-size: 1.2rem;
+      padding: 0.5rem;
+      margin-top: 0.3rem;
+      box-sizing: border-box;
+    }
+    #result {
+      margin-top: 1.5rem;
+      font-size: 1.3rem;
+      font-weight: bold;
+    }
+    #result.match {
+      color: green;
+    }
+    #result.nomatch {
+      color: red;
+    }
+  </style>
 </head>
 <body>
+  <h1>Ricerca Pacchi</h1>
 
-<h1>Trova il pacco con ultime cifre Tracking ID</h1>
+  <label for="targetInput">Inserisci ultime 4-5 cifre del tracking ID da cercare:</label>
+  <input type="text" id="targetInput" maxlength="5" placeholder="es. 12345" autocomplete="off" />
 
-<label for="partialInput">Inserisci ultime 4 o 5 cifre del Tracking ID:</label>
-<input type="text" id="partialInput" maxlength="5" autocomplete="off" />
+  <label for="scanInput">Scannerizza il codice del pacco:</label>
+  <input type="text" id="scanInput" autocomplete="off" autofocus />
 
-<label for="scanInput">Scannerizza il codice del pacco qui:</label>
-<input type="text" id="scanInput" autocomplete="off" autofocus />
+  <div id="result"></div>
 
-<div id="status">Stato: in attesa di scansione...</div>
+  <!-- Suono di conferma -->
+  <audio id="beepSound" src="https://actions.google.com/sounds/v1/cartoon/clang_and_wobble.ogg" preload="auto"></audio>
 
-<script>
-  const partialInput = document.getElementById('partialInput');
-  const scanInput = document.getElementById('scanInput');
-  const status = document.getElementById('status');
+  <script>
+    const targetInput = document.getElementById('targetInput');
+    const scanInput = document.getElementById('scanInput');
+    const resultDiv = document.getElementById('result');
+    const beepSound = document.getElementById('beepSound');
 
-  // Funzione per feedback sonoro
-  function playBeep() {
-    try {
-      const ctx = new AudioContext();
-      const oscillator = ctx.createOscillator();
-      oscillator.type = 'sine';
-      oscillator.frequency.setValueAtTime(1000, ctx.currentTime);
-      oscillator.connect(ctx.destination);
-      oscillator.start();
-      oscillator.stop(ctx.currentTime + 0.2);
-    } catch (e) {
-      // AudioContext non supportato
-      console.warn('AudioContext non supportato');
+    // Funzione per attivare vibrazione (se supportata)
+    function vibratePattern() {
+      if (navigator.vibrate) {
+        navigator.vibrate([200, 100, 200]);
+      }
     }
-  }
 
-  // Funzione per vibrazione (se supportata)
-  function vibrateDevice() {
-    if (navigator.vibrate) {
-      navigator.vibrate(200);
-    }
-  }
-
-  // Gestione evento Enter nella casella di scansione
-  scanInput.addEventListener('keydown', function(event) {
-    if (event.key === 'Enter') {
-      event.preventDefault();
-
-      const partial = partialInput.value.trim();
-      const scannedCode = scanInput.value.trim();
-
-      if (partial.length < 4) {
-        status.textContent = 'Inserisci almeno 4 cifre nelle ultime cifre del tracking ID.';
-        scanInput.value = '';
+    // Funzione di confronto e feedback
+    function checkMatch(scannedCode) {
+      const target = targetInput.value.trim();
+      if (target.length < 4 || target.length > 5) {
+        resultDiv.textContent = "Inserisci 4 o 5 cifre nel campo superiore.";
+        resultDiv.className = "nomatch";
         return;
       }
 
-      if (scannedCode.length === 0) {
-        status.textContent = 'Scannerizza un codice valido.';
-        return;
-      }
-
-      if (scannedCode.endsWith(partial)) {
-        status.textContent = `Pacco trovato! Codice scannerizzato: ${scannedCode}`;
-        playBeep();
-        vibrateDevice();
+      // Controlla se il codice scannerizzato termina con il target
+      if (scannedCode.endsWith(target)) {
+        resultDiv.textContent = "PACCO TROVATO! ✅";
+        resultDiv.className = "match";
+        beepSound.play();
+        vibratePattern();
       } else {
-        status.textContent = `Codice scannerizzato: ${scannedCode} (non corrisponde)`;
+        resultDiv.textContent = "Pacco NON corrispondente.";
+        resultDiv.className = "nomatch";
       }
-
-      // Pulisce la casella per la prossima scansione e la riporta a fuoco
-      scanInput.value = '';
-      scanInput.focus();
     }
-  });
 
-  // Per sicurezza, mettiamo il focus sulla casella di scansione all'apertura
-  window.onload = () => {
+    // Evento per quando viene inserito/scannerizzato un codice nel secondo campo
+    scanInput.addEventListener('keydown', function(event) {
+      if (event.key === 'Enter') {
+        const scannedCode = scanInput.value.trim();
+        if (scannedCode.length === 0) {
+          resultDiv.textContent = "Scannerizza un codice valido.";
+          resultDiv.className = "nomatch";
+          return;
+        }
+        checkMatch(scannedCode);
+        scanInput.value = ''; // Pulisce il campo per la prossima scansione
+      }
+    });
+
+    // Metti il focus sempre sulla casella di scansione per comodità
     scanInput.focus();
-  };
-</script>
-
+  </script>
 </body>
 </html>
