@@ -1,159 +1,24 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Parcel Tracking Finder</title>
-<style>
-  body {
-    margin: 0;
-    background-color: black;
-    color: white;
-    font-family: Arial, sans-serif;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    height: 100vh;
-    transition: background-color 0.3s ease;
-    padding: 1rem;
-  }
-  label {
-    font-size: 1.2rem;
-    margin-top: 1rem;
-  }
-  input {
-    font-size: 1.5rem;
-    padding: 0.5rem;
-    margin-top: 0.5rem;
-    width: 100%;
-    max-width: 300px;
-    border-radius: 5px;
-    border: none;
-    outline: none;
-    background-color: #222;
-    color: white;
-  }
-  input:focus {
-    outline: 2px solid white;
-  }
-  .container {
-    width: 100%;
-    max-width: 320px;
-  }
-  @media (max-width: 400px) {
-    input {
-      font-size: 1.2rem;
+  <meta charset="UTF-8">
+  <title>Centered Image</title>
+  <style>
+    body {
+      margin: 0;
+      background-color: black;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
     }
-    label {
-      font-size: 1rem;
+    img {
+      max-width: 100%;
+      height: auto;
     }
-  }
-</style>
+  </style>
 </head>
 <body>
-  <div class="container">
-    <label for="last4">Enter last 4 digits of tracking ID:</label>
-    <input type="text" id="last4" maxlength="4" placeholder="e.g. 7890" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" inputmode="numeric" />
-
-    <label for="scan">Scan or enter the full tracking code:</label>
-    <input type="text" id="scan" maxlength="20" placeholder="Format: BA1234567890" autocomplete="off" autocorrect="off" autocapitalize="characters" spellcheck="false" />
-  </div>
-
-<script>
-  const last4Input = document.getElementById('last4');
-  const scanInput = document.getElementById('scan');
-  const body = document.body;
-
-  // Beep sounds for different cases
-  function beepGreen() {
-    playBeep(1046, 120, 'square');
-  }
-  function beepRed() {
-    playBeep(196, 350, 'sine');
-  }
-  function beepYellow() {
-    playBeep(523, 70, 'triangle', () => {
-      setTimeout(() => playBeep(784, 70, 'triangle'), 80);
-    });
-  }
-  function playBeep(freq = 440, duration = 150, type = 'square', onEnded = null) {
-    const ctx = new (window.AudioContext || window.webkitAudioContext)();
-    const oscillator = ctx.createOscillator();
-    oscillator.type = type;
-    oscillator.frequency.setValueAtTime(freq, ctx.currentTime);
-    oscillator.connect(ctx.destination);
-    oscillator.start();
-    oscillator.stop(ctx.currentTime + duration / 1000);
-    oscillator.onended = () => {
-      if (onEnded) onEnded();
-      ctx.close();
-    };
-  }
-
-  function isValidTracking(code) {
-    return /^BA\d{10}$/.test(code);
-  }
-
-  function updateResult(color) {
-    body.style.backgroundColor = color;
-    switch(color) {
-      case 'green': beepGreen(); break;
-      case 'red': beepRed(); break;
-      case 'yellow': beepYellow(); break;
-      default: break;
-    }
-  }
-
-  // Only allow numbers in the last4 input
-  last4Input.addEventListener('input', () => {
-    last4Input.value = last4Input.value.replace(/\D/g, '').slice(0,4);
-    body.style.backgroundColor = 'black';
-  });
-
-  // Process scanned code immediately when input changes and length >= 6
-  scanInput.addEventListener('input', () => {
-    const last4 = last4Input.value.trim();
-    const code = scanInput.value.trim().toUpperCase();
-
-    if (code.length < 6) {
-      // Wait for more input before processing
-      return;
-    }
-
-    if (!isValidTracking(code)) {
-      updateResult('yellow');
-    } else if (last4.length !== 4) {
-      body.style.backgroundColor = 'black';
-    } else {
-      const codeLast4 = code.slice(-4);
-      if (codeLast4 === last4) {
-        updateResult('green');
-      } else {
-        updateResult('red');
-      }
-    }
-
-    // Clear input and keep focus for next scan
-    scanInput.value = '';
-    scanInput.focus();
-  });
-
-  // Optional: also process on Enter or Tab key (if scanner sends it)
-  scanInput.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter' || e.key === 'Tab') {
-      e.preventDefault();
-      // Just in case input is not processed yet
-      const code = scanInput.value.trim().toUpperCase();
-      if (code.length > 0) {
-        scanInput.dispatchEvent(new Event('input'));
-      }
-    }
-  });
-
-  window.addEventListener('load', () => {
-    last4Input.focus();
-  });
-</script>
+  <img src="20250630_0212_Sharp White Owl_remix_01jyz2rjcyeveb6fegadn45mjt.png" alt="Centered Owl Image">
 </body>
 </html>
