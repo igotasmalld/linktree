@@ -2,21 +2,33 @@
 <html lang="it">
 <head>
 <meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Scanner Pacchi - Scanner Integrato con Contatore</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+<title>Scanner Pacchi - Mobile Friendly</title>
 <style>
   body {
     font-family: Arial, sans-serif;
     transition: background-color 0.5s ease;
+    margin: 1em;
+    background-color: #fff;
+    color: #000;
   }
   label {
     display: block;
     margin-top: 1em;
+    font-size: 1.1em;
   }
   input {
     width: 100%;
     font-size: 1.2em;
-    padding: 0.5em;
+    padding: 0.8em;
+    margin-top: 0.3em;
+    box-sizing: border-box;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+  }
+  input:focus {
+    border-color: #007BFF;
+    outline: none;
   }
   #scanned {
     background-color: #eee;
@@ -30,13 +42,13 @@
 </head>
 <body>
 
-<h1>Ricerca Pacchi con Scanner Integrato</h1>
+<h1>Ricerca Pacchi</h1>
 
 <label for="inducted">Inducted (ultime 4 cifre tracking ID, separate da virgola):</label>
-<input type="text" id="inducted" placeholder="Es: 1234,5678,9012" />
+<input type="text" id="inducted" placeholder="Es: 1234,5678,9012" inputmode="numeric" pattern="[0-9, ]*" />
 
 <label for="scanned">Scanned (codice scannerizzato):</label>
-<input type="text" id="scanned" autocomplete="off" autofocus />
+<input type="text" id="scanned" autocomplete="off" autofocus inputmode="text" />
 
 <div id="counter">Pacchi scannerizzati: 0</div>
 
@@ -49,26 +61,20 @@
   let scanTimer;
   let scanCount = 0;
 
-  // Funzione per vibrare dispositivo (se supportato)
   function vibrateDevice() {
-    if (navigator.vibrate) {
-      navigator.vibrate(200);
-    }
+    if (navigator.vibrate) navigator.vibrate(200);
   }
 
-  // Funzione per aggiornare il contatore a schermo
   function updateCounter() {
     counterDiv.textContent = `Pacchi scannerizzati: ${scanCount}`;
   }
 
-  // Funzione per controllare se codice scannerizzato è nella lista
   function checkCode(code) {
     const last4 = code.slice(-4);
     const inductedList = inductedInput.value.split(',').map(s => s.trim());
     return inductedList.includes(last4);
   }
 
-  // Funzione per processare il codice scannerizzato
   function processScan(code) {
     scanCount++;
     updateCounter();
@@ -80,21 +86,16 @@
     } else {
       document.body.style.backgroundColor = '';
     }
-    // Pulisce il campo per la prossima scansione
     scannedInput.value = '';
     scannedInput.focus();
   }
 
-  // Mantieni il focus sul campo scanned
   scannedInput.focus();
 
-  // Ascolta i tasti premuti per catturare la scansione
   window.addEventListener('keydown', (e) => {
-    // Ignora tasti speciali come Shift, Ctrl, Alt, ecc.
     if (e.key.length === 1) {
       scanBuffer += e.key;
     }
-    // Se premuto invio o tab, consideriamo la scansione finita
     if (e.key === 'Enter' || e.key === 'Tab') {
       e.preventDefault();
       if (scanBuffer.length > 0) {
@@ -102,7 +103,6 @@
         scanBuffer = '';
       }
     }
-    // Reset timer per fine scansione dopo 300ms di inattività
     clearTimeout(scanTimer);
     scanTimer = setTimeout(() => {
       if (scanBuffer.length > 0) {
@@ -112,7 +112,6 @@
     }, 300);
   });
 
-  // Se il focus si perde, lo riportiamo al campo scanned
   window.addEventListener('focus', () => {
     scannedInput.focus();
   });
