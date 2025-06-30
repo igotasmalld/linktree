@@ -82,17 +82,21 @@
     const code = scannedInput.value.trim();
     if (code.length === 0) return;
 
-    // Vibra solo se il formato è corretto
     if (isValidFormat(code)) {
+      // Vibra se il formato è corretto
       if (navigator.vibrate) {
         navigator.vibrate(500);
       }
+
+      // Incrementa contatore solo se formato valido
+      count++;
+      counterDisplay.textContent = `Pacchi scannerizzati: ${count}`;
+
+      checkMatch(code);
+    } else {
+      // Non valido: nessuna vibrazione, nessun conteggio
+      document.body.style.backgroundColor = '';
     }
-
-    const isMatch = checkMatch(code);
-
-    count++;
-    counterDisplay.textContent = `Pacchi scannerizzati: ${count}`;
 
     // Svuota la casella per il prossimo codice
     scannedInput.value = '';
