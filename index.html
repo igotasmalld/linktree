@@ -6,7 +6,7 @@
 <title>Package Search</title>
 <style>
   body {
-    font-family: "Times New Roman", Times, serif;
+    font-family: Arial, sans-serif;
     padding: 20px;
     transition: background-color 0.3s ease;
   }
@@ -22,11 +22,6 @@
     margin-top: 5px;
     box-sizing: border-box;
   }
-  #counter {
-    margin-top: 20px;
-    font-size: 1.2em;
-    font-weight: bold;
-  }
 </style>
 </head>
 <body>
@@ -37,17 +32,12 @@
 <label for="scanned">Scanned</label>
 <input type="text" id="scanned"/>
 
-<div id="counter">Scanned: 0</div>
-
 <audio id="successSound" src="https://actions.google.com/sounds/v1/cartoon/wood_plank_flicks.ogg" preload="auto"></audio>
 
 <script>
   const inductedInput = document.getElementById('inducted');
   const scannedInput = document.getElementById('scanned');
   const successSound = document.getElementById('successSound');
-  const counterDisplay = document.getElementById('counter');
-
-  let count = 0;
 
   // Function to validate format IT + 10 digits
   function isValidFormat(code) {
@@ -84,10 +74,6 @@
       if (navigator.vibrate) {
         navigator.vibrate(500);
       }
-
-      // Increment counter only if format is valid
-      count++;
-      counterDisplay.textContent = `Packages scanned: ${count}`;
 
       checkMatch(code);
     } else {
