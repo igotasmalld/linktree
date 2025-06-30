@@ -30,13 +30,18 @@
 
   // Funzione per feedback sonoro
   function playBeep() {
-    const ctx = new AudioContext();
-    const oscillator = ctx.createOscillator();
-    oscillator.type = 'sine';
-    oscillator.frequency.setValueAtTime(1000, ctx.currentTime);
-    oscillator.connect(ctx.destination);
-    oscillator.start();
-    oscillator.stop(ctx.currentTime + 0.2);
+    try {
+      const ctx = new AudioContext();
+      const oscillator = ctx.createOscillator();
+      oscillator.type = 'sine';
+      oscillator.frequency.setValueAtTime(1000, ctx.currentTime);
+      oscillator.connect(ctx.destination);
+      oscillator.start();
+      oscillator.stop(ctx.currentTime + 0.2);
+    } catch (e) {
+      // AudioContext non supportato
+      console.warn('AudioContext non supportato');
+    }
   }
 
   // Funzione per vibrazione (se supportata)
@@ -46,10 +51,11 @@
     }
   }
 
-  // Funzione per gestire la scansione (invio automatico)
+  // Gestione evento Enter nella casella di scansione
   scanInput.addEventListener('keydown', function(event) {
     if (event.key === 'Enter') {
       event.preventDefault();
+
       const partial = partialInput.value.trim();
       const scannedCode = scanInput.value.trim();
 
@@ -64,7 +70,6 @@
         return;
       }
 
-      // Controlla se il codice scannerizzato termina con le cifre inserite
       if (scannedCode.endsWith(partial)) {
         status.textContent = `Pacco trovato! Codice scannerizzato: ${scannedCode}`;
         playBeep();
@@ -73,9 +78,16 @@
         status.textContent = `Codice scannerizzato: ${scannedCode} (non corrisponde)`;
       }
 
+      // Pulisce la casella per la prossima scansione e la riporta a fuoco
       scanInput.value = '';
+      scanInput.focus();
     }
   });
+
+  // Per sicurezza, mettiamo il focus sulla casella di scansione all'apertura
+  window.onload = () => {
+    scanInput.focus();
+  };
 </script>
 
 </body>
