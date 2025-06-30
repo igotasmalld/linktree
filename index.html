@@ -22,24 +22,17 @@
     margin-top: 5px;
     box-sizing: border-box;
   }
-  #counter {
-    margin-top: 20px;
-    font-size: 1.2em;
-    font-weight: bold;
-  }
 </style>
 </head>
 <body>
 
-<h1>AT STATION FINDER</h1>
+<h1>Ricerca Pacchi</h1>
 
-<label for="inducted">At Stations</label>
+<label for="inducted">Inducted (ultime 4 cifre, separate da virgola)</label>
 <input type="text" id="inducted" placeholder="Es: 1234, 5678, 9012" />
 
-<label for="scanned">Scanned</label>
+<label for="scanned">Scanned (inserisci/scansiona qui)</label>
 <input type="text" id="scanned" placeholder="Inserisci o scannerizza il codice" autofocus />
-
-<div id="counter">Scanned Packages: 0</div>
 
 <!-- Suono di conferma meno fastidioso -->
 <audio id="successSound" src="https://actions.google.com/sounds/v1/cartoon/wood_plank_flicks.ogg" preload="auto"></audio>
@@ -48,9 +41,12 @@
   const inductedInput = document.getElementById('inducted');
   const scannedInput = document.getElementById('scanned');
   const successSound = document.getElementById('successSound');
-  const counterDisplay = document.getElementById('counter');
 
-  let count = 0;
+  // Funzione per validare il formato IT + 10 numeri
+  function isValidFormat(code) {
+    const regex = /^IT\d{10}$/;
+    return regex.test(code);
+  }
 
   function checkMatch(scannedCode) {
     const inductedCodes = inductedInput.value
@@ -76,17 +72,18 @@
     const code = scannedInput.value.trim();
     if (code.length === 0) return;
 
-    const isMatch = checkMatch(code);
-
-    if (!isMatch) {
-      // Vibra se non è il pacco giusto (se supportato)
+    // Vibra solo se il formato è corretto
+    if (isValidFormat(code)) {
       if (navigator.vibrate) {
         navigator.vibrate(500);
       }
     }
 
-    count++;
-    counterDisplay.textContent = `Pacchi scannerizzati: ${count}`;
+    const isMatch = checkMatch(code);
+
+    if (!isMatch) {
+      // Non vibrare qui perché già fatto sopra solo se formato corretto
+    }
 
     // Svuota la casella per il prossimo codice
     scannedInput.value = '';
