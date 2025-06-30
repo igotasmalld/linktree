@@ -31,20 +31,13 @@
 <label for="inducted">Inducted (ultime 4 cifre, separate da virgola)</label>
 <input type="text" id="inducted" placeholder="Es: 1234, 5678, 9012" />
 
-<label for="scanned">Scanned (automatico)</label>
-<input type="text" id="scanned" readonly placeholder="Codice scannerizzato" />
+<label for="scanned">Scanned (inserisci/scansiona qui)</label>
+<input type="text" id="scanned" placeholder="Inserisci o scannerizza il codice" autofocus />
 
 <script>
   const inductedInput = document.getElementById('inducted');
   const scannedInput = document.getElementById('scanned');
 
-  // Funzione per simulare la scansione di un codice (per test)
-  function simulateScan(code) {
-    scannedInput.value = code;
-    checkMatch(code);
-  }
-
-  // Controlla se le ultime 4 cifre del codice scannerizzato sono in Inducted
   function checkMatch(scannedCode) {
     const inductedCodes = inductedInput.value
       .split(',')
@@ -55,22 +48,25 @@
       const last4 = scannedCode.slice(-4);
       if (inductedCodes.includes(last4)) {
         document.body.style.backgroundColor = 'lightgreen';
-        // Vibrate device if supported
         if (navigator.vibrate) {
           navigator.vibrate(500);
         }
-        return;
+        return true;
       }
     }
-    // Se non corrisponde, resetta sfondo
     document.body.style.backgroundColor = '';
+    return false;
   }
 
-  // Simulazione scansione: sostituisci con codice reale di scansione
-  // Per test, puoi chiamare simulateScan('ABC12345678') nella console del browser
+  scannedInput.addEventListener('input', () => {
+    const code = scannedInput.value.trim();
+    const isMatch = checkMatch(code);
 
-  // Esempio: dopo 2 secondi simula una scansione
-  setTimeout(() => simulateScan('XYZ12345678'), 2000);
+    if (!isMatch && code.length > 0) {
+      // Se non corrisponde, svuota subito la casella Scanned per il prossimo codice
+      scannedInput.value = '';
+    }
+  });
 </script>
 
 </body>
