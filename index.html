@@ -3,30 +3,30 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Ricerca Pacco con Scanner Integrato</title>
+<title>Ricerca Pacco per Ultime Cifre Tracking ID</title>
 <style>
   body { font-family: Arial, sans-serif; padding: 20px; }
-  #status { margin-top: 20px; font-weight: bold; font-size: 1.2em; }
+  label { font-weight: bold; margin-top: 10px; display: block; }
+  input { font-size: 1.2em; padding: 5px; width: 300px; }
+  #status { margin-top: 20px; font-weight: bold; font-size: 1.3em; }
 </style>
 </head>
 <body>
 
-<h1>Trova il pacco con Tracking ID</h1>
+<h1>Trova il pacco con ultime cifre Tracking ID</h1>
 
-<label for="trackingInput">Inserisci Tracking ID da cercare:</label><br />
-<input type="text" id="trackingInput" placeholder="Es. ABC123456789" style="width: 300px; font-size: 1.2em;" /><br />
+<label for="partialInput">Inserisci ultime 4 o 5 cifre del Tracking ID:</label>
+<input type="text" id="partialInput" maxlength="5" autocomplete="off" />
 
-<p>Scannerizza il codice del pacco con lo scanner integrato.</p>
+<label for="scanInput">Scannerizza il codice del pacco qui:</label>
+<input type="text" id="scanInput" autocomplete="off" autofocus />
 
 <div id="status">Stato: in attesa di scansione...</div>
 
 <script>
-  const trackingInput = document.getElementById('trackingInput');
+  const partialInput = document.getElementById('partialInput');
+  const scanInput = document.getElementById('scanInput');
   const status = document.getElementById('status');
-
-  // Buffer per raccogliere input dallo scanner (che simula una tastiera)
-  let scanBuffer = '';
-  let scanTimeout;
 
   // Funzione per feedback sonoro
   function playBeep() {
@@ -46,37 +46,35 @@
     }
   }
 
-  window.addEventListener('keydown', (e) => {
-    // Se il focus è sul campo di input, ignoriamo per non interferire con la digitazione manuale
-    if (document.activeElement === trackingInput) return;
+  // Funzione per gestire la scansione (invio automatico)
+  scanInput.addEventListener('keydown', function(event) {
+    if (event.key === 'Enter') {
+      event.preventDefault();
+      const partial = partialInput.value.trim();
+      const scannedCode = scanInput.value.trim();
 
-    // Accumula i caratteri letti dallo scanner
-    if (e.key.length === 1) {
-      scanBuffer += e.key;
-    } else if (e.key === 'Enter') {
-      // Fine scansione, confronta con tracking ID
-      const scannedCode = scanBuffer.trim();
-      scanBuffer = '';
-
-      if (!trackingInput.value) {
-        status.textContent = 'Inserisci prima un Tracking ID da cercare.';
+      if (partial.length < 4) {
+        status.textContent = 'Inserisci almeno 4 cifre nelle ultime cifre del tracking ID.';
+        scanInput.value = '';
         return;
       }
 
-      if (scannedCode === trackingInput.value.trim()) {
-        status.textContent = `Pacco trovato! Tracking ID: ${scannedCode}`;
+      if (scannedCode.length === 0) {
+        status.textContent = 'Scannerizza un codice valido.';
+        return;
+      }
+
+      // Controlla se il codice scannerizzato termina con le cifre inserite
+      if (scannedCode.endsWith(partial)) {
+        status.textContent = `Pacco trovato! Codice scannerizzato: ${scannedCode}`;
         playBeep();
         vibrateDevice();
       } else {
-        status.textContent = `Codice letto: ${scannedCode} (non corrisponde)`;
+        status.textContent = `Codice scannerizzato: ${scannedCode} (non corrisponde)`;
       }
-    }
 
-    // Timeout per reset buffer in caso di scansione incompleta
-    clearTimeout(scanTimeout);
-    scanTimeout = setTimeout(() => {
-      scanBuffer = '';
-    }, 100); // 100ms dopo l'ultimo carattere, reset buffer
+      scanInput.value = '';
+    }
   });
 </script>
 
