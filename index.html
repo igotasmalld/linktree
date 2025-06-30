@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Scanner Pacchi - Scanner Integrato</title>
+<title>Scanner Pacchi - Scanner Integrato con Contatore</title>
 <style>
   body {
     font-family: Arial, sans-serif;
@@ -21,6 +21,11 @@
   #scanned {
     background-color: #eee;
   }
+  #counter {
+    margin-top: 1em;
+    font-size: 1.3em;
+    font-weight: bold;
+  }
 </style>
 </head>
 <body>
@@ -33,18 +38,27 @@
 <label for="scanned">Scanned (codice scannerizzato):</label>
 <input type="text" id="scanned" autocomplete="off" autofocus />
 
+<div id="counter">Pacchi scannerizzati: 0</div>
+
 <script>
   const inductedInput = document.getElementById('inducted');
   const scannedInput = document.getElementById('scanned');
+  const counterDiv = document.getElementById('counter');
 
   let scanBuffer = '';
   let scanTimer;
+  let scanCount = 0;
 
   // Funzione per vibrare dispositivo (se supportato)
   function vibrateDevice() {
     if (navigator.vibrate) {
       navigator.vibrate(200);
     }
+  }
+
+  // Funzione per aggiornare il contatore a schermo
+  function updateCounter() {
+    counterDiv.textContent = `Pacchi scannerizzati: ${scanCount}`;
   }
 
   // Funzione per controllare se codice scannerizzato è nella lista
@@ -56,6 +70,9 @@
 
   // Funzione per processare il codice scannerizzato
   function processScan(code) {
+    scanCount++;
+    updateCounter();
+
     scannedInput.value = code;
     if (checkCode(code)) {
       document.body.style.backgroundColor = 'lightgreen';
