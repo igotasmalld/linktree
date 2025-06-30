@@ -2,23 +2,90 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Centered Image</title>
+  <title>Fake News Headlines</title>
   <style>
     body {
-      margin: 0;
       background-color: black;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
+      color: white;
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 20px;
     }
-    img {
-      max-width: 20%;
-      height: auto;
+
+    h1 {
+      text-align: center;
+      margin-bottom: 40px;
+    }
+
+    .news-container {
+      max-width: 800px;
+      margin: 0 auto;
+    }
+
+    .news-item {
+      background-color: #1e1e1e;
+      border-left: 5px solid crimson;
+      padding: 15px 20px;
+      margin-bottom: 20px;
+      border-radius: 8px;
+    }
+
+    .news-item h2 {
+      margin: 0 0 10px;
+      font-size: 1.4em;
+      color: #ff4d4d;
+    }
+
+    .news-item p {
+      margin: 0;
+      font-size: 1em;
+      line-height: 1.4em;
     }
   </style>
 </head>
 <body>
-  <img src="20250630_0212_Sharp White Owl_remix_01jyz2rjcyeveb6fegadn45mjt.png" alt="Centered Owl Image">
+  <h1>Top 10 Fake News Stories</h1>
+  <div class="news-container">
+    <div class="news-item">
+      <h2>Aliens Buy Stake in Tesla, Elon Approves</h2>
+      <p>In a surprising turn of events, a Martian investment group reportedly purchased 15% of Tesla shares.</p>
+    </div>
+    <div class="news-item">
+      <h2>Bananas Declared Official Currency in Iceland</h2>
+      <p>Due to economic reforms, Iceland now uses bananas as a medium of exchange nationwide.</p>
+    </div>
+    <div class="news-item">
+      <h2>Scientists Clone T-Rex Using Chicken DNA</h2>
+      <p>Geneticists have successfully brought back a miniature T-Rex the size of a corgi. Jurassic Park confirmed.</p>
+    </div>
+    <div class="news-item">
+      <h2>Google Maps Now Shows Parallel Universes</h2>
+      <p>New feature allows users to view coffee shops in alternate timelines. Beta access only.</p>
+    </div>
+    <div class="news-item">
+      <h2>NASA Admits Moon is Just a Hologram</h2>
+      <p>According to a leaked document, the moon is a projection to hide the real moon behind it.</p>
+    </div>
+    <div class="news-item">
+      <h2>Time Travel Now Legalized in Switzerland</h2>
+      <p>New laws allow citizens to visit the past—under strict guidelines to avoid paradoxes.</p>
+    </div>
+    <div class="news-item">
+      <h2>Pizza Found to Cure 87% of Known Diseases</h2>
+      <p>A new study shows high-carb pizza crusts hold unexpected healing powers.</p>
+    </div>
+    <div class="news-item">
+      <h2>Dogs Learn to Code in Silicon Valley</h2>
+      <p>Golden retrievers have been seen deploying apps after completing a 6-week bootcamp.</p>
+    </div>
+    <div class="news-item">
+      <h2>World Leaders Settle Dispute with Dance Battle</h2>
+      <p>G20 summit ends in a breakdancing showdown between presidents and prime ministers.</p>
+    </div>
+    <div class="news-item">
+      <h2>Ocean Discovered to Be Made of Blue Gatorade</h2>
+      <p>Scientists find electrolytes in seawater match sports drinks. Mermaids rejoice.</p>
+    </div>
+  </div>
 </body>
 </html>
