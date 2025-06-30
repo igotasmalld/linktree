@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
-<title>Scanner Pacchi - Mobile Friendly</title>
+<title>Scanner Pacchi - Funzionante con Scanner Integrato</title>
 <style>
   body {
     font-family: Arial, sans-serif;
@@ -42,13 +42,13 @@
 </head>
 <body>
 
-<h1>Ricerca Pacchi</h1>
+<h1>Ricerca Pacchi con Scanner Integrato</h1>
 
 <label for="inducted">Inducted (ultime 4 cifre tracking ID, separate da virgola):</label>
 <input type="text" id="inducted" placeholder="Es: 1234,5678,9012" inputmode="numeric" pattern="[0-9, ]*" />
 
 <label for="scanned">Scanned (codice scannerizzato):</label>
-<input type="text" id="scanned" autocomplete="off" autofocus inputmode="text" />
+<input type="text" id="scanned" autocomplete="off" readonly />
 
 <div id="counter">Pacchi scannerizzati: 0</div>
 
@@ -61,20 +61,24 @@
   let scanTimer;
   let scanCount = 0;
 
+  // Funzione per vibrare dispositivo (se supportato)
   function vibrateDevice() {
     if (navigator.vibrate) navigator.vibrate(200);
   }
 
+  // Aggiorna contatore a schermo
   function updateCounter() {
     counterDiv.textContent = `Pacchi scannerizzati: ${scanCount}`;
   }
 
+  // Controlla se il codice è nella lista Inducted
   function checkCode(code) {
     const last4 = code.slice(-4);
     const inductedList = inductedInput.value.split(',').map(s => s.trim());
     return inductedList.includes(last4);
   }
 
+  // Elabora la scansione completa
   function processScan(code) {
     scanCount++;
     updateCounter();
@@ -86,16 +90,25 @@
     } else {
       document.body.style.backgroundColor = '';
     }
-    scannedInput.value = '';
-    scannedInput.focus();
+
+    // Dopo breve pausa, pulisce il campo e mantiene il focus
+    setTimeout(() => {
+      scannedInput.value = '';
+      scannedInput.focus();
+    }, 1000);
   }
 
-  scannedInput.focus();
+  // Mantieni sempre il focus sul body per catturare i tasti
+  window.focus();
 
+  // Listener globale per catturare i tasti dallo scanner
   window.addEventListener('keydown', (e) => {
+    // Ignora tasti speciali (Shift, Ctrl, Alt, ecc.)
     if (e.key.length === 1) {
       scanBuffer += e.key;
     }
+
+    // Se premuto Invio o Tab, considera la scansione finita
     if (e.key === 'Enter' || e.key === 'Tab') {
       e.preventDefault();
       if (scanBuffer.length > 0) {
@@ -103,6 +116,8 @@
         scanBuffer = '';
       }
     }
+
+    // Timer per rilevare fine scansione dopo 300ms di inattività
     clearTimeout(scanTimer);
     scanTimer = setTimeout(() => {
       if (scanBuffer.length > 0) {
@@ -112,6 +127,12 @@
     }, 300);
   });
 
+  // Forza il focus sul body e sul campo scanned all’avvio
+  window.addEventListener('load', () => {
+    scannedInput.focus();
+  });
+
+  // Se il focus si perde, riportalo sul campo scanned
   window.addEventListener('focus', () => {
     scannedInput.focus();
   });
