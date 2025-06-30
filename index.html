@@ -22,6 +22,11 @@
     margin-top: 5px;
     box-sizing: border-box;
   }
+  #counter {
+    margin-top: 20px;
+    font-size: 1.2em;
+    font-weight: bold;
+  }
 </style>
 </head>
 <body>
@@ -34,6 +39,8 @@
 <label for="scanned">Scanned (inserisci/scansiona qui)</label>
 <input type="text" id="scanned" placeholder="Inserisci o scannerizza il codice" autofocus />
 
+<div id="counter">Pacchi scannerizzati: 0</div>
+
 <!-- Suono di conferma meno fastidioso -->
 <audio id="successSound" src="https://actions.google.com/sounds/v1/cartoon/wood_plank_flicks.ogg" preload="auto"></audio>
 
@@ -41,6 +48,9 @@
   const inductedInput = document.getElementById('inducted');
   const scannedInput = document.getElementById('scanned');
   const successSound = document.getElementById('successSound');
+  const counterDisplay = document.getElementById('counter');
+
+  let count = 0;
 
   // Funzione per validare il formato IT + 10 numeri
   function isValidFormat(code) {
@@ -81,9 +91,8 @@
 
     const isMatch = checkMatch(code);
 
-    if (!isMatch) {
-      // Non vibrare qui perché già fatto sopra solo se formato corretto
-    }
+    count++;
+    counterDisplay.textContent = `Pacchi scannerizzati: ${count}`;
 
     // Svuota la casella per il prossimo codice
     scannedInput.value = '';
