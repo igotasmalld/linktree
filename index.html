@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="it">
+<html lang="en">
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Ricerca Pacchi</title>
+<title>Package Search</title>
 <style>
   body {
     font-family: Arial, sans-serif;
@@ -34,14 +34,14 @@
 <h1>At Station Searcher</h1>
 
 <label for="inducted">Inducted</label>
-<input type="text" id="inducted" placeholder="Es: 1234, 5678, 9012" />
+<input type="text" id="inducted" placeholder="E.g.: 1234, 5678, 9012" />
 
 <label for="scanned">Scanned</label>
-<input type="text" id="scanned" placeholder="Inserisci o scannerizza il codice" autofocus />
+<input type="text" id="scanned" placeholder="Enter or scan the code" autofocus />
 
 <div id="counter">Scanned: 0</div>
 
-<!-- Suono di conferma meno fastidioso -->
+<!-- Less annoying confirmation sound -->
 <audio id="successSound" src="https://actions.google.com/sounds/v1/cartoon/wood_plank_flicks.ogg" preload="auto"></audio>
 
 <script>
@@ -52,7 +52,7 @@
 
   let count = 0;
 
-  // Funzione per validare il formato IT + 10 numeri
+  // Function to validate format IT + 10 digits
   function isValidFormat(code) {
     const regex = /^IT\d{10}$/;
     return regex.test(code);
@@ -68,7 +68,7 @@
       const last4 = scannedCode.slice(-4);
       if (inductedCodes.includes(last4)) {
         document.body.style.backgroundColor = 'lightgreen';
-        // Riproduci suono di conferma
+        // Play confirmation sound
         successSound.currentTime = 0;
         successSound.play();
         return true;
@@ -83,22 +83,22 @@
     if (code.length === 0) return;
 
     if (isValidFormat(code)) {
-      // Vibra se il formato è corretto
+      // Vibrate if format is correct
       if (navigator.vibrate) {
         navigator.vibrate(500);
       }
 
-      // Incrementa contatore solo se formato valido
+      // Increment counter only if format is valid
       count++;
-      counterDisplay.textContent = `Pacchi scannerizzati: ${count}`;
+      counterDisplay.textContent = `Packages scanned: ${count}`;
 
       checkMatch(code);
     } else {
-      // Non valido: nessuna vibrazione, nessun conteggio
+      // Invalid: no vibration, no counting
       document.body.style.backgroundColor = '';
     }
 
-    // Svuota la casella per il prossimo codice
+    // Clear the input box for the next code
     scannedInput.value = '';
   });
 </script>
