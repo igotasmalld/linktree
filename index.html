@@ -55,6 +55,9 @@
     const resultDiv = document.getElementById('result');
     const beepSound = document.getElementById('beepSound');
 
+    let scanBuffer = "";
+    let scanTimeout;
+
     // Funzione per attivare vibrazione (se supportata)
     function vibratePattern() {
       if (navigator.vibrate) {
@@ -71,7 +74,6 @@
         return;
       }
 
-      // Controlla se il codice scannerizzato termina con il target
       if (scannedCode.endsWith(target)) {
         resultDiv.textContent = "PACCO TROVATO! ✅";
         resultDiv.className = "match";
@@ -83,22 +85,38 @@
       }
     }
 
-    // Evento per quando viene inserito/scannerizzato un codice nel secondo campo
-    scanInput.addEventListener('keydown', function(event) {
-      if (event.key === 'Enter') {
-        const scannedCode = scanInput.value.trim();
-        if (scannedCode.length === 0) {
-          resultDiv.textContent = "Scannerizza un codice valido.";
-          resultDiv.className = "nomatch";
-          return;
+    // Gestione input scanner senza invio automatico
+    scanInput.addEventListener('keypress', (e) => {
+      // Accumula i caratteri ricevuti
+      scanBuffer += e.key;
+
+      // Reset del timeout a ogni tasto premuto
+      clearTimeout(scanTimeout);
+
+      // Dopo 100ms di pausa consideriamo la scansione finita
+      scanTimeout = setTimeout(() => {
+        if (scanBuffer.length > 0) {
+          checkMatch(scanBuffer.trim());
+          scanBuffer = "";
+          scanInput.value = "";
         }
-        checkMatch(scannedCode);
-        scanInput.value = ''; // Pulisce il campo per la prossima scansione
-      }
+      }, 100);
     });
 
-    // Metti il focus sempre sulla casella di scansione per comodità
+    // Mantieni sempre il focus sul campo di scansione
     scanInput.focus();
+
+    // Optional: se vuoi, puoi anche gestire il tasto Enter normalmente
+    scanInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault(); // evita invio form o altro
+        if (scanBuffer.length > 0) {
+          checkMatch(scanBuffer.trim());
+          scanBuffer = "";
+          scanInput.value = "";
+        }
+      }
+    });
   </script>
 </body>
 </html>
