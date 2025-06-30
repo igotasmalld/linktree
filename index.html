@@ -34,9 +34,13 @@
 <label for="scanned">Scanned (inserisci/scansiona qui)</label>
 <input type="text" id="scanned" placeholder="Inserisci o scannerizza il codice" autofocus />
 
+<!-- Audio per suono di conferma -->
+<audio id="successSound" src="https://actions.google.com/sounds/v1/cartoon/clang_and_wobble.ogg" preload="auto"></audio>
+
 <script>
   const inductedInput = document.getElementById('inducted');
   const scannedInput = document.getElementById('scanned');
+  const successSound = document.getElementById('successSound');
 
   function checkMatch(scannedCode) {
     const inductedCodes = inductedInput.value
@@ -48,9 +52,9 @@
       const last4 = scannedCode.slice(-4);
       if (inductedCodes.includes(last4)) {
         document.body.style.backgroundColor = 'lightgreen';
-        if (navigator.vibrate) {
-          navigator.vibrate(500);
-        }
+        // Riproduci suono di conferma
+        successSound.currentTime = 0;
+        successSound.play();
         return true;
       }
     }
@@ -60,12 +64,19 @@
 
   scannedInput.addEventListener('input', () => {
     const code = scannedInput.value.trim();
+    if (code.length === 0) return; // ignora input vuoto
+
     const isMatch = checkMatch(code);
 
-    if (!isMatch && code.length > 0) {
-      // Se non corrisponde, svuota subito la casella Scanned per il prossimo codice
-      scannedInput.value = '';
+    if (!isMatch) {
+      // Vibra se non è il pacco giusto (se supportato)
+      if (navigator.vibrate) {
+        navigator.vibrate(500);
+      }
     }
+
+    // In ogni caso svuota la casella per il prossimo codice
+    scannedInput.value = '';
   });
 </script>
 
