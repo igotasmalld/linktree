@@ -27,11 +27,11 @@
 </head>
 <body>
 
-<label for="inducted">Inducted</label>
-<input type="text" id="inducted"/>
+<label for="inducted">Insert</label>
+<input type="text" id="inducted" placeholder="Enter comma-separated 4-digit codes" />
 
 <label for="scanned">Scanned</label>
-<input type="text" id="scanned"/>
+<input type="text" id="scanned" placeholder="Scan or enter code (IT + 10 digits)" />
 
 <audio id="successSound" src="https://actions.google.com/sounds/v1/cartoon/wood_plank_flicks.ogg" preload="auto"></audio>
 
@@ -40,13 +40,18 @@
   const scannedInput = document.getElementById('scanned');
   const successSound = document.getElementById('successSound');
 
-  // Function to validate format IT + 10 digits
+  // Set audio volume to maximum
+  successSound.volume = 1.0;
+
+  // Function to validate format: IT + 10 digits
   function isValidFormat(code) {
     const regex = /^IT\d{10}$/;
     return regex.test(code);
   }
 
+  // Check if last 4 digits of scanned code match any inducted code
   function checkMatch(scannedCode) {
+    // Get inducted codes as an array of trimmed 4-digit strings
     const inductedCodes = inductedInput.value
       .split(',')
       .map(s => s.trim())
@@ -62,6 +67,8 @@
         return true;
       }
     }
+
+    // Reset background color if no match
     document.body.style.backgroundColor = '';
     return false;
   }
@@ -71,14 +78,14 @@
     if (code.length === 0) return;
 
     if (isValidFormat(code)) {
-      // Vibrate if format is correct
+      // Vibrate if format is correct (if supported)
       if (navigator.vibrate) {
         navigator.vibrate(500);
       }
 
       checkMatch(code);
     } else {
-      // Invalid: no vibration, no counting
+      // Invalid format: reset background color
       document.body.style.backgroundColor = '';
     }
 
