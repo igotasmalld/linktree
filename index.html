@@ -78,10 +78,10 @@
     const code = scannedInput.value.trim();
     if (code.length === 0) return;
 
-    scannedCount++;
-    counterDisplay.textContent = `Packages scanned: ${scannedCount}`;
-
     if (isValidFormat(code)) {
+      scannedCount++;
+      counterDisplay.textContent = `Packages scanned: ${scannedCount}`;
+
       if (navigator.vibrate) {
         navigator.vibrate(500);
       }
