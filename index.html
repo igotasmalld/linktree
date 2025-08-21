@@ -23,6 +23,11 @@
     box-sizing: border-box;
     border: 1px solid black; /* Black border added */
   }
+  #counter {
+    margin-top: 20px;
+    font-size: 1.2em;
+    font-weight: bold;
+  }
 </style>
 </head>
 <body>
@@ -33,12 +38,18 @@
 <label for="scanned">Scanned</label>
 <input type="text" id="scanned"/>
 
+<!-- Counter display -->
+<div id="counter">Packages scanned: 0</div>
+
 <audio id="successSound" src="https://actions.google.com/sounds/v1/cartoon/wood_plank_flicks.ogg" preload="auto"></audio>
 
 <script>
   const inductedInput = document.getElementById('inducted');
   const scannedInput = document.getElementById('scanned');
   const successSound = document.getElementById('successSound');
+  const counterDisplay = document.getElementById('counter');
+
+  let scannedCount = 0; // Counter variable
 
   // Function to validate format IT + 10 digits
   function isValidFormat(code) {
@@ -59,6 +70,9 @@
         // Play confirmation sound
         successSound.currentTime = 0;
         successSound.play();
+        // Increment and update counter
+        scannedCount++;
+        counterDisplay.textContent = `Packages scanned: ${scannedCount}`;
         return true;
       }
     }
