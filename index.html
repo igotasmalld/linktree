@@ -1,98 +1,10 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Package Search</title>
-<style>
-  body {
-    font-family: Arial, sans-serif;
-    padding: 20px;
-    transition: background-color 0.3s ease;
-  }
-  label {
-    display: block;
-    margin-top: 15px;
-    font-weight: bold;
-  }
-  input[type="text"] {
-    width: 100%;
-    padding: 8px;
-    font-size: 1em;
-    margin-top: 5px;
-    box-sizing: border-box;
-    border: 1px solid black;
-  }
-  #counter {
-    margin-top: 20px;
-    font-size: 1.2em;
-    font-weight: bold;
-  }
-</style>
+    <title>Simple Website</title>
 </head>
 <body>
-
-<label for="inducted">Inducted</label>
-<input type="text" id="inducted" />
-
-<label for="scanned">Scanned</label>
-<input type="text" id="scanned" />
-
-<div id="counter">Packages scanned: 0</div>
-
-<audio id="successSound" src="https://actions.google.com/sounds/v1/cartoon/wood_plank_flicks.ogg" preload="auto"></audio>
-
-<script>
-  const inductedInput = document.getElementById('inducted');
-  const scannedInput = document.getElementById('scanned');
-  const successSound = document.getElementById('successSound');
-  const counterDisplay = document.getElementById('counter');
-
-  let scannedCount = 0;
-
-  function isValidFormat(code) {
-    const regex = /^IT\d{10}$/;
-    return regex.test(code);
-  }
-
-  function checkMatch(scannedCode) {
-    const inductedCodes = inductedInput.value
-      .split(',')
-      .map(s => s.trim())
-      .filter(s => s.length === 4);
-
-    if (scannedCode.length >= 4) {
-      const last4 = scannedCode.slice(-4);
-      if (inductedCodes.includes(last4)) {
-        document.body.style.backgroundColor = 'lightgreen';
-        successSound.currentTime = 0;
-        successSound.play();
-        return true;
-      }
-    }
-    document.body.style.backgroundColor = '';
-    return false;
-  }
-
-  scannedInput.addEventListener('input', () => {
-    const code = scannedInput.value.trim();
-    if (code.length === 0) return;
-
-    if (isValidFormat(code)) {
-      scannedCount++;
-      counterDisplay.textContent = `Packages scanned: ${scannedCount}`;
-
-      if (navigator.vibrate) {
-        navigator.vibrate(500);
-      }
-      checkMatch(code);
-    } else {
-      document.body.style.backgroundColor = '';
-    }
-
-    scannedInput.value = '';
-  });
-</script>
-
+    <h1>Hello, World!</h1>
+    <p>Welcome to my simple HTML website.</p>
 </body>
 </html>
