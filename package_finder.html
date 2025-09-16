@@ -16,7 +16,7 @@
         display: block;
         margin-top: 15px;
       }
-      input[type="text"] {
+      input[type="tel"] {
         width: 100%;
         padding: 8px;
         font-size: 1em;
@@ -37,9 +37,9 @@
       >Type the last digits of the tracking IDs, separated by a comma and a
       space (example: 1234, 2345, 4567):</label
     >
-    <input type="text" id="inducted" />
+    <input type="tel" id="inducted" autocomplete="off" />
     <label for="scanned">Scan the QR Codes of the packages:</label>
-    <input type="text" id="scanned" autocomplete="off" />
+    <input type="tel" id="scanned" autocomplete="off" />
     <div id="counter">Number of packages scanned: 0</div>
     <audio
       id="successSound"
