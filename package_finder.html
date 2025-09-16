@@ -27,6 +27,7 @@
       #counter {
         margin-top: 20px;
         font-size: 1.1em;
+        white-space: pre-line; /* preserve line breaks */
       }
     </style>
   </head>
@@ -37,25 +38,21 @@
       space (example: 1234, 2345, 4567):</label
     >
     <input type="text" id="inducted" />
-
     <label for="scanned">Scan the QR Codes of the packages:</label>
-    <input type="text" id="scanned" />
-
+    <input type="text" id="scanned" autocomplete="off" />
     <div id="counter">Number of packages scanned: 0</div>
-
     <audio
       id="successSound"
       src="https://actions.google.com/sounds/v1/cartoon/wood_plank_flicks.ogg"
       preload="auto"
     ></audio>
-
     <script>
       const inductedInput = document.getElementById("inducted");
       const scannedInput = document.getElementById("scanned");
       const successSound = document.getElementById("successSound");
       const counterDisplay = document.getElementById("counter");
-
       let scannedCount = 0;
+      let foundList = [];
 
       function isValidFormat(code) {
         const regex = /^IT\d{10}$/;
@@ -67,13 +64,15 @@
           .split(",")
           .map((s) => s.trim())
           .filter((s) => s.length === 4);
-
         if (scannedCode.length >= 4) {
           const last4 = scannedCode.slice(-4);
           if (inductedCodes.includes(last4)) {
             document.body.style.backgroundColor = "lightgreen";
             successSound.currentTime = 0;
             successSound.play();
+            if (!foundList.includes(last4)) {
+              foundList.push(last4);
+            }
             return true;
           }
         }
@@ -84,19 +83,18 @@
       scannedInput.addEventListener("input", () => {
         const code = scannedInput.value.trim();
         if (code.length === 0) return;
-
         if (isValidFormat(code)) {
           scannedCount++;
-          counterDisplay.textContent = `Packages scanned: ${scannedCount}`;
-
+          checkMatch(code);
+          let foundText = foundList.map(c => `${c} - Found`).join("\n");
+          counterDisplay.textContent = `Number of packages scanned: ${scannedCount}` + 
+                                       (foundList.length > 0 ? `\n${foundText}` : "");
           if (navigator.vibrate) {
             navigator.vibrate(500);
           }
-          checkMatch(code);
         } else {
           document.body.style.backgroundColor = "";
         }
-
         scannedInput.value = "";
       });
     </script>
