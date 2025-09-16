@@ -60,19 +60,25 @@
       }
 
       function checkMatch(scannedCode) {
-        const inductedCodes = inductedInput.value
+        let inductedCodes = inductedInput.value
           .split(",")
           .map((s) => s.trim())
           .filter((s) => s.length === 4);
+
         if (scannedCode.length >= 4) {
           const last4 = scannedCode.slice(-4);
           if (inductedCodes.includes(last4)) {
             document.body.style.backgroundColor = "lightgreen";
             successSound.currentTime = 0;
             successSound.play();
+
             if (!foundList.includes(last4)) {
               foundList.push(last4);
             }
+            // Remove found last4 from inducted codes
+            inductedCodes = inductedCodes.filter(code => code !== last4);
+            inductedInput.value = inductedCodes.join(", ");
+
             return true;
           }
         }
