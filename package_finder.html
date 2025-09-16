@@ -54,6 +54,33 @@
       let scannedCount = 0;
       let foundList = [];
 
+      // Format inducted input to add comma+space after every 4 digits automatically
+      inductedInput.addEventListener("input", (event) => {
+        let cursorPos = inductedInput.selectionStart;
+        let rawValue = inductedInput.value;
+        // Remove all non-digit characters (except commas and spaces) to preserve typed commas
+        let digitsOnly = rawValue.replace(/[^0-9]/g, "");
+        // Split into groups of 4
+        let formatted = digitsOnly.match(/.{1,4}/g);
+        if (formatted) {
+          let newValue = formatted.join(", ");
+          inductedInput.value = newValue;
+
+          // Adjust cursor position to stay corrected
+          let countCommasBeforeCursor = (rawValue.slice(0, cursorPos).match(/,/g) || []).length;
+          // Calculate expected new cursor position
+          let newCursorPos = cursorPos;
+          if (cursorPos === rawValue.length) {
+            // Cursor at end, just set after new value length
+            newCursorPos = newValue.length;
+          } else {
+            // Approximate new position after format, can be improved if needed
+            newCursorPos = newValue.length;
+          }
+          inductedInput.setSelectionRange(newCursorPos, newCursorPos);
+        }
+      });
+
       function isValidFormat(code) {
         const regex = /^IT\d{10}$/;
         return regex.test(code);
