@@ -94,7 +94,7 @@
           checkMatch(code);
           let foundText = foundList.map(c => `${c} - Found`).join("\n");
           counterDisplay.textContent = `Number of packages scanned: ${scannedCount}` + 
-                                       (foundList.length > 0 ? `\n${foundText}` : "");
+                                       (foundList.length > 0 ? `\n\n${foundText}` : "");
           if (navigator.vibrate) {
             navigator.vibrate(500);
           }
