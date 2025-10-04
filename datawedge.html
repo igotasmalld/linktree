@@ -6,26 +6,6 @@
   <title>Open Chrome App</title>
 </head>
 <body>
-  <button id="openChromeButton">Open DataWedge App</button>
-
-  <script>
-    document.getElementById('openChromeButton').addEventListener('click', function() {
-      // URL to open in Chrome
-      var targetUrl = "https://www.google.com"; // Change to your desired URL
-
-      // Android intent URL to open Chrome with target URL
-      var intentUrl = "intent://"+targetUrl.replace(/^https?:\/\//, '')+"#Intent;scheme=https;package=com.android.chrome;end";
-
-      // Attempt to open Chrome via intent scheme
-      window.location.href = intentUrl;
-
-      // Fallback: if Chrome isn't installed, you may want to redirect to the URL directly
-      setTimeout(function() {
-        window.location.href = targetUrl;
-      }, 2000);
-    });
-  </script>
-
   <button onclick="openDataWedge()">Open DataWedge</button>
 
 <script>
