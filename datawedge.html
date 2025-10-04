@@ -1,46 +1,9 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Open DataWedge</title>
-    <script src="cordova.js"></script>
-</head>
-<body>
-    <button id="openDataWedgeBtn" disabled>Open DataWedge App</button>
+<button onclick="openChrome()">Open Chrome</button>
 
-    <script>
-        document.addEventListener('deviceready', function () {
-            const button = document.getElementById('openDataWedgeBtn');
-            button.disabled = false; // Enable button when ready
-
-            button.addEventListener('click', function () {
-                if (!window.plugins || !window.plugins.intentShim) {
-                    alert('Intent plugin not available');
-                    return;
-                }
-
-                // Verify if package exists
-                window.plugins.intentShim.packageExists('com.symbol.datawedge', function(exists) {
-                    if (!exists) {
-                        alert('DataWedge app is not installed on this device.');
-                        return;
-                    }
-
-                    window.plugins.intentShim.startActivity(
-                        {
-                            action: 'android.intent.action.MAIN',
-                            package: 'com.symbol.datawedge',
-                            className: 'com.symbol.datawedge.LauncherActivity'
-                        },
-                        function() {
-                            console.log('DataWedge app launched successfully');
-                        },
-                        function(error) {
-                            alert('Failed to launch DataWedge app: ' + error);
-                        }
-                    );
-                });
-            });
-        }, false);
-    </script>
-</body>
-</html>
+<script>
+function openChrome() {
+  // This tries to open Google Chrome using the URL scheme "googlechrome://"
+  // If Chrome is installed, it will open it; otherwise, it may fallback to opening in the current browser
+  window.location.href = "googlechrome://navigate?url=https://www.google.com";
+}
+</script>
