@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Open DataWedge</title>
+    <script src="cordova.js"></script>
+    <script src="plugins/cordova-plugin-intentshim/www/intentshim.js"></script>
+</head>
+<body>
+    <button id="openDataWedgeBtn">Open DataWedge App</button>
+
+    <script>
+        document.getElementById("openDataWedgeBtn").addEventListener("click", function() {
+            window.plugins.intentShim.startActivity(
+                {
+                    action: 'android.intent.action.MAIN',
+                    package: 'com.symbol.datawedge',
+                    className: 'com.symbol.datawedge.LauncherActivity'
+                },
+                function() {
+                    console.log('DataWedge app launched successfully');
+                },
+                function(error) {
+                    console.error('Failed to launch DataWedge app: ' + error);
+                }
+            );
+        });
+    </script>
+</body>
+</html>
