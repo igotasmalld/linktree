@@ -1,19 +1,18 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Open Chrome App</title>
+  <title>Open DataWedge</title>
+  <script>
+    function openDataWedge() {
+      // Intent URL to open DataWedge app by package name
+      var intentUrl = "intent://#Intent;package=com.symbol.datawedge;end";
+
+      // Setting window location to the intent URL
+      window.location.href = intentUrl;
+    }
+  </script>
 </head>
 <body>
-  <button onclick="openDataWedge()">Open DataWedge</button>
-
-<script>
-function openDataWedge() {
-  // Example intent URL scheme to start an app by its package name, works only on Chrome for Android
-  window.location = "intent://#Intent;package=com.symbol.datawedge;end";
-}
-</script>
-
+  <button onclick="openDataWedge()">Open DataWedge App</button>
 </body>
 </html>
