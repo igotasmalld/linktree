@@ -1,16 +1,19 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>Open DataWedge</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Open Android Settings</title>
+    <script>
+        function openSettings() {
+            // Try to open Android Settings via intent URL
+            window.location.href = "intent:#Intent;action=android.settings.SETTINGS;end";
+        }
+    </script>
 </head>
 <body>
-  <button onclick="openDatawedge()">Open DataWedge</button>
-
-  <script>
-    function openDatawedge() {
-      // Intent URL format to open the app by package name
-      window.location.href = "intent://#Intent;package=com.symbol.datawedge;end";
-    }
-  </script>
+    <h1>Open Android Settings</h1>
+    <button onclick="openSettings()">Open Settings</button>
+    <p>If clicking the button doesn't work, your browser might not support this feature.</p>
 </body>
 </html>
