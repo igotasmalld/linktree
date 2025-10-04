@@ -3,27 +3,44 @@
 <head>
     <title>Open DataWedge</title>
     <script src="cordova.js"></script>
-    <script src="plugins/cordova-plugin-intentshim/www/intentshim.js"></script>
 </head>
 <body>
-    <button id="openDataWedgeBtn">Open DataWedge App</button>
+    <button id="openDataWedgeBtn" disabled>Open DataWedge App</button>
 
     <script>
-        document.getElementById("openDataWedgeBtn").addEventListener("click", function() {
-            window.plugins.intentShim.startActivity(
-                {
-                    action: 'android.intent.action.MAIN',
-                    package: 'com.symbol.datawedge',
-                    className: 'com.symbol.datawedge.LauncherActivity'
-                },
-                function() {
-                    console.log('DataWedge app launched successfully');
-                },
-                function(error) {
-                    console.error('Failed to launch DataWedge app: ' + error);
+        document.addEventListener('deviceready', function () {
+            const button = document.getElementById('openDataWedgeBtn');
+            button.disabled = false; // Enable button when ready
+
+            button.addEventListener('click', function () {
+                if (!window.plugins || !window.plugins.intentShim) {
+                    alert('Intent plugin not available');
+                    return;
                 }
-            );
-        });
+
+                // Verify if package exists
+                window.plugins.intentShim.packageExists('com.symbol.datawedge', function(exists) {
+                    if (!exists) {
+                        alert('DataWedge app is not installed on this device.');
+                        return;
+                    }
+
+                    window.plugins.intentShim.startActivity(
+                        {
+                            action: 'android.intent.action.MAIN',
+                            package: 'com.symbol.datawedge',
+                            className: 'com.symbol.datawedge.LauncherActivity'
+                        },
+                        function() {
+                            console.log('DataWedge app launched successfully');
+                        },
+                        function(error) {
+                            alert('Failed to launch DataWedge app: ' + error);
+                        }
+                    );
+                });
+            });
+        }, false);
     </script>
 </body>
 </html>
