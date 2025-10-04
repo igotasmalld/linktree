@@ -2,17 +2,15 @@
 <html>
 <head>
   <title>Open DataWedge</title>
-  <script>
-    function openDataWedge() {
-      // Intent URL to open DataWedge app by package name
-      var intentUrl = "intent://#Intent;package=com.symbol.datawedge;end";
-
-      // Setting window location to the intent URL
-      window.location.href = intentUrl;
-    }
-  </script>
 </head>
 <body>
-  <button onclick="openDataWedge()">Open DataWedge App</button>
+  <button onclick="openDatawedge()">Open DataWedge</button>
+
+  <script>
+    function openDatawedge() {
+      // Intent URL format to open the app by package name
+      window.location.href = "intent://#Intent;package=com.symbol.datawedge;end";
+    }
+  </script>
 </body>
 </html>
