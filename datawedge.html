@@ -1,9 +1,27 @@
-<button onclick="openChrome()">Open Chrome</button>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Open Chrome Button</title>
+</head>
+<body>
+  <button id="openChromeButton">Open Chrome</button>
 
-<script>
-function openChrome() {
-  // This tries to open Google Chrome using the URL scheme "googlechrome://"
-  // If Chrome is installed, it will open it; otherwise, it may fallback to opening in the current browser
-  window.location.href = "googlechrome://navigate?url=https://www.google.com";
-}
-</script>
+  <script>
+    document.getElementById('openChromeButton').addEventListener('click', function() {
+      // Intent URL to open Chrome on Android with a URL
+      var urlToOpen = "https://www.google.com";
+
+      // Intent format for Android to open Chrome with a URL
+      var chromeIntent = "intent://" + urlToOpen.replace(/^https?:\/\//, '') +
+                         "#Intent;scheme=https;package=com.android.chrome;end";
+
+      // Attempt to open Chrome
+      window.location.href = chromeIntent;
+
+      // Note: If Chrome is not installed, behavior may vary and fallback to default browser usually happens
+    });
+  </script>
+</body>
+</html>
