@@ -1,11 +1,37 @@
 <!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Document</title>
-  </head>
-  <body>
-    <p>Work in Progress</p>
-  </body>
+<html>
+<head>
+  <title>Send Visitor IP</title>
+</head>
+<body>
+  <script>
+    // Function to get IP via ipify API
+    function getVisitorIP() {
+      fetch('https://api.ipify.org?format=json')
+        .then(response => response.json())
+        .then(data => {
+          const visitorIP = data.ip;
+          console.log('Visitor IP:', visitorIP);
+
+          // Send the IP to your server
+          fetch('/collect-ip', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ ip: visitorIP })
+          }).then(res => {
+            console.log('IP sent to server');
+          }).catch(err => {
+            console.error('Error sending IP:', err);
+          });
+        })
+        .catch(err => {
+          console.error('Error fetching IP:', err);
+        });
+    }
+
+    getVisitorIP();
+  </script>
+</body>
 </html>
