@@ -9,8 +9,8 @@
         font-family: "Franklin Gothic Medium", "Arial Narrow", Arial, sans-serif;
         padding: 20px;
         transition: background-color 0.3s ease;
-        background-color: gainsboro;
-        color: black;
+        background-color: black;
+        color: white;
       }
       label {
         display: block;
@@ -22,12 +22,19 @@
         font-size: 1em;
         margin-top: 5px;
         box-sizing: border-box;
-        border: 1px solid black;
+        border: 1px solid white;
+        background-color: black;
+        color: white;
       }
       #counter {
         margin-top: 20px;
         font-size: 1.1em;
         white-space: pre-line; /* preserve line breaks */
+        color: white;
+      }
+      /* Make numbers inside #counter yellow */
+      #counter::selection {
+        color: yellow;
       }
     </style>
   </head>
@@ -39,7 +46,9 @@
     <input type="tel" id="inducted" autocomplete="off" />
     <label for="scanned">Scan the QR Codes of the packages:</label>
     <input type="tel" id="scanned" autocomplete="off" />
-    <div id="counter">Number of packages scanned: 0</div>
+    <div id="counter">
+      Number of packages scanned: <span class="numbers">0</span>
+    </div>
     <audio
       id="successSound"
       src="https://actions.google.com/sounds/v1/cartoon/wood_plank_flicks.ogg"
@@ -102,13 +111,13 @@
               foundList.push(last4);
             }
             // Remove found last4 from inducted codes
-            inductedCodes = inductedCodes.filter(code => code !== last4);
+            inductedCodes = inductedCodes.filter((code) => code !== last4);
             inductedInput.value = inductedCodes.join(", ");
 
             return true;
           }
         }
-        document.body.style.backgroundColor = "";
+        document.body.style.backgroundColor = "black";
         return false;
       }
 
@@ -118,14 +127,17 @@
         if (isValidFormat(code)) {
           scannedCount++;
           checkMatch(code);
-          let foundText = foundList.map(c => `${c} - Found`).join("\n");
-          counterDisplay.textContent = `Number of packages scanned: ${scannedCount}` + 
-                                       (foundList.length > 0 ? `\n\n${foundText}` : "");
+          let foundText = foundList.map((c) => `${c} - Found`).join("\n");
+          counterDisplay.innerHTML =
+            `Number of packages scanned: <span style="color: yellow;">${scannedCount}</span>` +
+            (foundList.length > 0
+              ? `<br><br><span style="color: yellow;">${foundText.replace(/\n/g, "<br>")}</span>`
+              : "");
           if (navigator.vibrate) {
             navigator.vibrate(500);
           }
         } else {
-          document.body.style.backgroundColor = "";
+          document.body.style.backgroundColor = "black";
         }
         scannedInput.value = "";
       });
