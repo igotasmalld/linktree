@@ -5,81 +5,41 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Package Finder</title>
     <style>
-      /* Base styling */
       body {
         font-family: "Franklin Gothic Medium", "Arial Narrow", Arial, sans-serif;
-        padding: 15px;
+        padding: 20px;
         transition: background-color 0.3s ease;
-        background-color: black;
-        color: white;
-        max-width: 720px;
-        margin: 0 auto;
-        box-sizing: border-box;
+        background-color: gainsboro;
+        color: black;
       }
       label {
         display: block;
-        margin-top: 12px;
-        font-size: 1.2em;
+        margin-top: 15px;
       }
       input[type="tel"] {
         width: 100%;
-        padding: 10px;
-        font-size: 1.1em;
-        margin-top: 6px;
+        padding: 8px;
+        font-size: 1em;
+        margin-top: 5px;
         box-sizing: border-box;
-        border: 1.5px solid white;
-        border-radius: 5px;
-        background-color: black;
-        color: white;
+        border: 1px solid black;
       }
       #counter {
-        margin-top: 18px;
-        font-size: 1.2em;
+        margin-top: 20px;
+        font-size: 1.1em;
         white-space: pre-line; /* preserve line breaks */
-        color: white;
-      }
-      /* Numbers inside #counter yellow */
-      #counter span {
-        color: yellow;
-      }
-      /* Smaller heading for better fit */
-      h1 {
-        font-size: 1.8em;
-        margin: 0;
-      }
-
-      /* Responsive adjustments for 720px wide portrait */
-      @media only screen and (max-width: 720px) and (orientation: portrait) {
-        body {
-          padding: 12px 8px;
-          font-size: 16px;
-        }
-        label {
-          font-size: 1.1em;
-        }
-        input[type="tel"] {
-          font-size: 1em;
-          padding: 8px;
-        }
-        h1 {
-          font-size: 1.5em;
-        }
-        #counter {
-          font-size: 1.1em;
-          margin-top: 15px;
-        }
       }
     </style>
   </head>
   <body>
     <label for="inducted"><h1>Package Finder</h1></label>
-    <label for="inducted">Type the last 4 digits of the Tracking IDs:</label>
+    <label for="inducted"
+      >Type the last 4 digits of the Tracking IDs:</label
+    >
     <input type="tel" id="inducted" autocomplete="off" />
     <label for="scanned">Scan the QR Codes of the packages:</label>
     <input type="tel" id="scanned" autocomplete="off" />
-    <div id="counter">
-      Number of packages scanned: <span class="numbers">0</span>
-    </div>
+    <div id="counter">Number of packages scanned: 0</div>
     <audio
       id="successSound"
       src="https://actions.google.com/sounds/v1/cartoon/wood_plank_flicks.ogg"
@@ -110,8 +70,10 @@
           // Calculate expected new cursor position
           let newCursorPos = cursorPos;
           if (cursorPos === rawValue.length) {
+            // Cursor at end, just set after new value length
             newCursorPos = newValue.length;
           } else {
+            // Approximate new position after format, can be improved if needed
             newCursorPos = newValue.length;
           }
           inductedInput.setSelectionRange(newCursorPos, newCursorPos);
@@ -139,13 +101,14 @@
             if (!foundList.includes(last4)) {
               foundList.push(last4);
             }
-            inductedCodes = inductedCodes.filter((code) => code !== last4);
+            // Remove found last4 from inducted codes
+            inductedCodes = inductedCodes.filter(code => code !== last4);
             inductedInput.value = inductedCodes.join(", ");
 
             return true;
           }
         }
-        document.body.style.backgroundColor = "black";
+        document.body.style.backgroundColor = "";
         return false;
       }
 
@@ -155,17 +118,14 @@
         if (isValidFormat(code)) {
           scannedCount++;
           checkMatch(code);
-          let foundText = foundList.map((c) => `${c} - Found`).join("\n");
-          counterDisplay.innerHTML =
-            `Number of packages scanned: <span style="color: yellow;">${scannedCount}</span>` +
-            (foundList.length > 0
-              ? `<br><br><span style="color: yellow;">${foundText.replace(/\n/g, "<br>")}</span>`
-              : "");
+          let foundText = foundList.map(c => `${c} - Found`).join("\n");
+          counterDisplay.textContent = `Number of packages scanned: ${scannedCount}` + 
+                                       (foundList.length > 0 ? `\n\n${foundText}` : "");
           if (navigator.vibrate) {
             navigator.vibrate(500);
           }
         } else {
-          document.body.style.backgroundColor = "black";
+          document.body.style.backgroundColor = "";
         }
         scannedInput.value = "";
       });
