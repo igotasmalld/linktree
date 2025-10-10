@@ -5,44 +5,75 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Package Finder</title>
     <style>
+      /* Base styling */
       body {
         font-family: "Franklin Gothic Medium", "Arial Narrow", Arial, sans-serif;
-        padding: 20px;
+        padding: 15px;
         transition: background-color 0.3s ease;
         background-color: black;
         color: white;
+        max-width: 720px;
+        margin: 0 auto;
+        box-sizing: border-box;
       }
       label {
         display: block;
-        margin-top: 15px;
+        margin-top: 12px;
+        font-size: 1.2em;
       }
       input[type="tel"] {
         width: 100%;
-        padding: 8px;
-        font-size: 1em;
-        margin-top: 5px;
+        padding: 10px;
+        font-size: 1.1em;
+        margin-top: 6px;
         box-sizing: border-box;
-        border: 1px solid white;
+        border: 1.5px solid white;
+        border-radius: 5px;
         background-color: black;
         color: white;
       }
       #counter {
-        margin-top: 20px;
-        font-size: 1.1em;
+        margin-top: 18px;
+        font-size: 1.2em;
         white-space: pre-line; /* preserve line breaks */
         color: white;
       }
-      /* Make numbers inside #counter yellow */
-      #counter::selection {
+      /* Numbers inside #counter yellow */
+      #counter span {
         color: yellow;
+      }
+      /* Smaller heading for better fit */
+      h1 {
+        font-size: 1.8em;
+        margin: 0;
+      }
+
+      /* Responsive adjustments for 720px wide portrait */
+      @media only screen and (max-width: 720px) and (orientation: portrait) {
+        body {
+          padding: 12px 8px;
+          font-size: 16px;
+        }
+        label {
+          font-size: 1.1em;
+        }
+        input[type="tel"] {
+          font-size: 1em;
+          padding: 8px;
+        }
+        h1 {
+          font-size: 1.5em;
+        }
+        #counter {
+          font-size: 1.1em;
+          margin-top: 15px;
+        }
       }
     </style>
   </head>
   <body>
     <label for="inducted"><h1>Package Finder</h1></label>
-    <label for="inducted"
-      >Type the last 4 digits of the Tracking IDs:</label
-    >
+    <label for="inducted">Type the last 4 digits of the Tracking IDs:</label>
     <input type="tel" id="inducted" autocomplete="off" />
     <label for="scanned">Scan the QR Codes of the packages:</label>
     <input type="tel" id="scanned" autocomplete="off" />
@@ -79,10 +110,8 @@
           // Calculate expected new cursor position
           let newCursorPos = cursorPos;
           if (cursorPos === rawValue.length) {
-            // Cursor at end, just set after new value length
             newCursorPos = newValue.length;
           } else {
-            // Approximate new position after format, can be improved if needed
             newCursorPos = newValue.length;
           }
           inductedInput.setSelectionRange(newCursorPos, newCursorPos);
@@ -110,7 +139,6 @@
             if (!foundList.includes(last4)) {
               foundList.push(last4);
             }
-            // Remove found last4 from inducted codes
             inductedCodes = inductedCodes.filter((code) => code !== last4);
             inductedInput.value = inductedCodes.join(", ");
 
