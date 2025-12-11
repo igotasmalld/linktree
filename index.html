@@ -3,72 +3,9 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>DLO1.com Website</title>
-    <style>
-      body {
-        font-family: "Helvetica", sans-serif;
-        background-color: black;
-        color: white;
-      }
-      .custom-button {
-        background: black;
-        border: 2px solid white;
-        padding: 2px 30px;
-        font-family: "Helvetica", Times, serif;
-        font-size: 22px;
-        color: white;
-        text-align: center;
-        box-sizing: border-box;
-        cursor: pointer;
-      }
-      /* Style all numbers inside body to yellow */
-      body {
-        /* This rule is just for text color default */
-        color: white;
-      }
-      /* Use a span or direct CSS to color numbers */
-      body {
-        /* Use a CSS trick with ::selection or content but better use JS or CSS attribute */
-      }
-      /* CSS to color all digits in the text */
-      body * {
-        color: white;
-      }
-      body * {
-        /* use a trick with CSS */
-      }
-      /* CSS for numbers inside elements */
-      /* Use a filter via animation or use a span - simpler with JS */
-    </style>
+    <title>Document</title>
   </head>
   <body>
-    <button
-      type="button"
-      onclick="window.location.href='https://www.dlo1.com/package_finder.html';"
-      class="custom-button"
-    >
-      Natasha Finder
-    </button>
-    <script>
-      // Color all numbers yellow in the body text dynamically
-      function colorNumbersYellow(element) {
-        element.childNodes.forEach((node) => {
-          if (node.nodeType === Node.TEXT_NODE) {
-            const replacedHTML = node.textContent.replace(
-              /(\d+)/g,
-              '<span style="color: yellow;">$1</span>'
-            );
-            if (replacedHTML !== node.textContent) {
-              const span = document.createElement("span");
-              span.innerHTML = replacedHTML;
-              node.replaceWith(span);
-            }
-          } else if (node.nodeType === Node.ELEMENT_NODE) {
-            colorNumbersYellow(node);
-          }
-        });
-      }
-      colorNumbersYellow(document.body);
-    </script>
+    Work in progress
   </body>
 </html>
