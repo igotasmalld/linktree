@@ -6,15 +6,15 @@
     <title>Redirecting...</title>
 </head>
 <body>
-    
     <script>
         const targetUrl = 'https://www.amazon.it/';
         
         document.getElementById('target-url').href = targetUrl;
         document.getElementById('target-url').textContent = targetUrl;
-          setTimeout(() => {
+        
+        setTimeout(() => {
             window.location.href = targetUrl;
-        }, 1000);
+        }, 3000);
     </script>
 </body>
 </html>
