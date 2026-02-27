@@ -6,7 +6,6 @@
     <title>Redirecting...</title>
 </head>
 <body>
-    <p>Redirecting to <a id="target-url">new page</a> in 3 seconds...</p>
     
     <script>
         const targetUrl = 'https://www.amazon.it/';
@@ -14,9 +13,6 @@
         document.getElementById('target-url').href = targetUrl;
         document.getElementById('target-url').textContent = targetUrl;
         
-        setTimeout(() => {
-            window.location.href = targetUrl;
-        }, 3000);
     </script>
 </body>
 </html>
