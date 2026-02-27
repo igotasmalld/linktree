@@ -3,18 +3,115 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DLO1.COM</title>
+    <title>Catch the Ball Game</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f0f0f0;
+            font-family: Arial, sans-serif;
+        }
+        #gameContainer {
+            text-align: center;
+        }
+        canvas {
+            border: 2px solid #333;
+            background-color: #87CEEB;
+            cursor: pointer;
+        }
+        #score {
+            font-size: 24px;
+            margin: 10px 0;
+            color: #333;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+    </style>
 </head>
 <body>
+    <div id="gameContainer">
+        <h1>Catch the Ball!</h1>
+        <div id="score">Score: 0</div>
+        <canvas id="gameCanvas" width="400" height="400"></canvas>
+        <br>
+        <button onclick="startGame()">Start Game</button>
+        <button onclick="resetGame()">Reset</button>
+    </div>
+
     <script>
-        const targetUrl = 'https://www.amazon.it/';
-        
-        document.getElementById('target-url').href = targetUrl;
-        document.getElementById('target-url').textContent = targetUrl;
-        
-        setTimeout(() => {
-            window.location.href = targetUrl;
-        }, 3000);
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        const scoreElement = document.getElementById('score');
+
+        let score = 0;
+        let ball = { x: 200, y: 200, radius: 30 };
+        let gameRunning = false;
+        let gameLoop;
+
+        function drawBall() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.beginPath();
+            ctx.arc(ball.x, ball.y, ball.radius, 0, Math.PI * 2);
+            ctx.fillStyle = '#FF4500';
+            ctx.fill();
+            ctx.strokeStyle = '#FFF';
+            ctx.lineWidth = 3;
+            ctx.stroke();
+        }
+
+        function moveBall() {
+            ball.x = Math.random() * (canvas.width - ball.radius * 2) + ball.radius;
+            ball.y = Math.random() * (canvas.height - ball.radius * 2) + ball.radius;
+        }
+
+        function updateScore() {
+            score++;
+            scoreElement.textContent = `Score: ${score}`;
+            moveBall();
+            drawBall();
+        }
+
+        canvas.addEventListener('click', (e) => {
+            if (!gameRunning) return;
+            const rect = canvas.getBoundingClientRect();
+            const clickX = e.clientX - rect.left;
+            const clickY = e.clientY - rect.top;
+            const distance = Math.sqrt((clickX - ball.x) ** 2 + (clickY - ball.y) ** 2);
+            if (distance <= ball.radius) {
+                updateScore();
+            }
+        });
+
+        function gameLoop() {
+            drawBall();
+        }
+
+        function startGame() {
+            gameRunning = true;
+            score = 0;
+            scoreElement.textContent = 'Score: 0';
+            moveBall();
+            gameLoop = setInterval(gameLoop, 1000); // Ball moves every second
+        }
+
+        function resetGame() {
+            gameRunning = false;
+            clearInterval(gameLoop);
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            score = 0;
+            scoreElement.textContent = 'Score: 0';
+            ball.x = 200;
+            ball.y = 200;
+        }
+
+        // Initial draw
+        drawBall();
     </script>
 </body>
 </html>
