@@ -1,22 +1,22 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <style>
-      body {
-        font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
-        background-color: #white;
-        margin-left: 20px;
-      }
-      h1 {
-        font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
-        color: #white;
-      }
-      p {
-        color: black;
-      }
-    </style>
-  </head>
-  <body>
-    <h1><b>This website is currently not active.</b></h1>
-  </body>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Redirecting...</title>
+</head>
+<body>
+    <p>Redirecting to <a id="target-url">new page</a> in 3 seconds...</p>
+    
+    <script>
+        const targetUrl = 'https://www.amazon.it/';
+        
+        document.getElementById('target-url').href = targetUrl;
+        document.getElementById('target-url').textContent = targetUrl;
+        
+        setTimeout(() => {
+            window.location.href = targetUrl;
+        }, 3000);
+    </script>
+</body>
 </html>
