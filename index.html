@@ -3,115 +3,94 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Catch the Ball Game</title>
+    <title>Snake Game</title>
     <style>
-        body {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            margin: 0;
-            background-color: #f0f0f0;
-            font-family: Arial, sans-serif;
-        }
-        #gameContainer {
-            text-align: center;
-        }
-        canvas {
-            border: 2px solid #333;
-            background-color: #87CEEB;
-            cursor: pointer;
-        }
-        #score {
-            font-size: 24px;
-            margin: 10px 0;
-            color: #333;
-        }
-        button {
-            padding: 10px 20px;
-            font-size: 16px;
-            cursor: pointer;
-        }
+        body { margin: 0; display: flex; justify-content: center; align-items: center; height: 100vh; background: #222; font-family: Arial, sans-serif; }
+        canvas { border: 2px solid #fff; background: #000; }
+        #score { position: absolute; top: 10px; left: 50%; transform: translateX(-50%); color: #fff; font-size: 24px; }
     </style>
 </head>
 <body>
-    <div id="gameContainer">
-        <h1>Catch the Ball!</h1>
-        <div id="score">Score: 0</div>
-        <canvas id="gameCanvas" width="400" height="400"></canvas>
-        <br>
-        <button onclick="startGame()">Start Game</button>
-        <button onclick="resetGame()">Reset</button>
-    </div>
+    <div id="score">Score: 0</div>
+    <canvas id="gameCanvas" width="400" height="400"></canvas>
 
     <script>
         const canvas = document.getElementById('gameCanvas');
         const ctx = canvas.getContext('2d');
         const scoreElement = document.getElementById('score');
 
+        const gridSize = 20;
+        const tileCount = canvas.width / gridSize;
+
+        let snake = [{ x: 10, y: 10 }];
+        let food = { x: 15, y: 15 };
+        let dx = 0;
+        let dy = 0;
         let score = 0;
-        let ball = { x: 200, y: 200, radius: 30 };
-        let gameRunning = false;
-        let gameLoop;
+        let gameRunning = true;
 
-        function drawBall() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            ctx.beginPath();
-            ctx.arc(ball.x, ball.y, ball.radius, 0, Math.PI * 2);
-            ctx.fillStyle = '#FF4500';
-            ctx.fill();
-            ctx.strokeStyle = '#FFF';
-            ctx.lineWidth = 3;
-            ctx.stroke();
-        }
-
-        function moveBall() {
-            ball.x = Math.random() * (canvas.width - ball.radius * 2) + ball.radius;
-            ball.y = Math.random() * (canvas.height - ball.radius * 2) + ball.radius;
-        }
-
-        function updateScore() {
-            score++;
-            scoreElement.textContent = `Score: ${score}`;
-            moveBall();
-            drawBall();
-        }
-
-        canvas.addEventListener('click', (e) => {
-            if (!gameRunning) return;
-            const rect = canvas.getBoundingClientRect();
-            const clickX = e.clientX - rect.left;
-            const clickY = e.clientY - rect.top;
-            const distance = Math.sqrt((clickX - ball.x) ** 2 + (clickY - ball.y) ** 2);
-            if (distance <= ball.radius) {
-                updateScore();
-            }
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowUp' && dy !== 1) { dx = 0; dy = -1; }
+            if (e.key === 'ArrowDown' && dy !== -1) { dx = 0; dy = 1; }
+            if (e.key === 'ArrowLeft' && dx !== 1) { dx = -1; dy = 0; }
+            if (e.key === 'ArrowRight' && dx !== -1) { dx = 1; dy = 0; }
         });
 
-        function gameLoop() {
-            drawBall();
+        function drawGame() {
+            if (!gameRunning) return;
+
+            // Clear canvas
+            ctx.fillStyle = 'black';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // Move snake
+            const head = { x: snake[0].x + dx, y: snake[0].y + dy };
+            snake.unshift(head);
+
+            // Check food collision
+            if (head.x === food.x && head.y === food.y) {
+                score++;
+                scoreElement.textContent = `Score: ${score}`;
+                generateFood();
+            } else {
+                snake.pop();
+            }
+
+            // Check wall collision
+            if (head.x < 0 || head.x >= tileCount || head.y < 0 || head.y >= tileCount || snakeCollides(head)) {
+                gameRunning = false;
+                alert(`Game Over! Final Score: ${score}`);
+                return;
+            }
+
+            // Draw snake
+            ctx.fillStyle = 'lime';
+            snake.forEach(segment => {
+                ctx.fillRect(segment.x * gridSize, segment.y * gridSize, gridSize - 2, gridSize - 2);
+            });
+
+            // Draw food
+            ctx.fillStyle = 'red';
+            ctx.fillRect(food.x * gridSize, food.y * gridSize, gridSize - 2, gridSize - 2);
+
+            setTimeout(drawGame, 150);
         }
 
-        function startGame() {
-            gameRunning = true;
-            score = 0;
-            scoreElement.textContent = 'Score: 0';
-            moveBall();
-            gameLoop = setInterval(gameLoop, 1000); // Ball moves every second
+        function generateFood() {
+            food.x = Math.floor(Math.random() * tileCount);
+            food.y = Math.floor(Math.random() * tileCount);
+            // Ensure food doesn't spawn on snake
+            if (snake.some(segment => segment.x === food.x && segment.y === food.y)) {
+                generateFood();
+            }
         }
 
-        function resetGame() {
-            gameRunning = false;
-            clearInterval(gameLoop);
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            score = 0;
-            scoreElement.textContent = 'Score: 0';
-            ball.x = 200;
-            ball.y = 200;
+        function snakeCollides(head) {
+            return snake.some(segment => segment.x === head.x && segment.y === head.y);
         }
 
-        // Initial draw
-        drawBall();
+        // Start game
+        drawGame();
     </script>
 </body>
 </html>
