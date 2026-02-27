@@ -12,7 +12,9 @@
         
         document.getElementById('target-url').href = targetUrl;
         document.getElementById('target-url').textContent = targetUrl;
-        
+          setTimeout(() => {
+            window.location.href = targetUrl;
+        }, 3000);
     </script>
 </body>
 </html>
